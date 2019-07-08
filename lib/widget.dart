@@ -91,13 +91,20 @@ class InfiniteListItem {
 class InfiniteList extends StatefulWidget {
   final ItemBuilder builder;
   final ScrollController controller;
-  final Key _centerKey = UniqueKey();
+  final Key _centerKey;
+  final InfiniteListDirection direction;
+  final int maxChildCount;
+  final int minChildCount;
 
   InfiniteList({
     Key key,
     @required this.builder,
     this.controller,
-  }): super(key: key);
+    this.direction = InfiniteListDirection.forward,
+    this.maxChildCount,
+    this.minChildCount,
+  }): _centerKey = (direction == InfiniteListDirection.multi) ? UniqueKey() : null,
+      super(key: key);
 
   @override
   State<StatefulWidget> createState() => _InfiniteListState();
@@ -107,14 +114,20 @@ class InfiniteList extends StatefulWidget {
 class _InfiniteListState extends State<InfiniteList> {
   StreamController<StickyState> _streamController = StreamController<StickyState>.broadcast();
 
+  int get _reverseChildCount => widget.minChildCount == null ? null : widget.minChildCount * -1;
+
   SliverList get _reverseList => SliverList(
     delegate: SliverChildBuilderDelegate(
-          (BuildContext context, int index) => _getListItem(context, (index + 1) * -1),
+      (BuildContext context, int index) => _getListItem(context, (index + 1) * -1),
+      childCount: _reverseChildCount,
     ),
   );
 
   SliverList get _forwardList => SliverList(
-    delegate: SliverChildBuilderDelegate(_getListItem),
+    delegate: SliverChildBuilderDelegate(
+      _getListItem,
+      childCount: widget.maxChildCount,
+    ),
     key: widget._centerKey,
   );
 
@@ -124,14 +137,33 @@ class _InfiniteListState extends State<InfiniteList> {
     listItem: widget.builder(context, index),
   );
 
+  List<SliverList> get _slivers {
+    switch (widget.direction) {
+      case InfiniteListDirection.multi:
+        return [
+          _reverseList,
+          _forwardList,
+        ];
+
+      case InfiniteListDirection.reverse:
+        return [
+          _reverseList,
+        ];
+
+      case InfiniteListDirection.forward:
+      default:
+        return [
+          _forwardList,
+        ];
+    }
+  }
+
   @override
   Widget build(BuildContext context) => CustomScrollView(
     controller: widget.controller,
     center: widget._centerKey,
-    slivers: [
-      _reverseList,
-      _forwardList,
-    ],
+    slivers: _slivers,
+    reverse: widget.direction == InfiniteListDirection.reverse,
   );
 
   @override

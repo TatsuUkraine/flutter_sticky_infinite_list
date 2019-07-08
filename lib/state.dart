@@ -5,6 +5,12 @@ typedef Widget HeaderStateBuilder(BuildContext context, StickyState state);
 typedef Widget HeaderBuilder(BuildContext context);
 typedef double MinOffsetProvider(StickyState state);
 
+enum InfiniteListDirection {
+  forward,
+  reverse,
+  multi,
+}
+
 class StickyState {
   final double position;
   final double offset;
