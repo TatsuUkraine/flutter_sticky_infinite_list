@@ -3,7 +3,7 @@ import 'dart:math' show max, min;
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import './sticky_list.dart';
+import './state.dart';
 
 class ListItemRenderObject extends RenderStack {
   ScrollableState _scrollable;

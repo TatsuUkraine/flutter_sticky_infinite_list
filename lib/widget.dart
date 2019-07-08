@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import './sticky_list.dart';
+import './state.dart';
 import './render.dart';
 
 typedef InfiniteListItem ItemBuilder(BuildContext context, int index);
