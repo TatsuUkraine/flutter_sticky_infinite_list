@@ -6,8 +6,7 @@ typedef Widget HeaderBuilder(BuildContext context);
 typedef double MinOffsetProvider<I>(StickyState<I> state);
 
 enum InfiniteListDirection {
-  forward,
-  reverse,
+  single,
   multi,
 }
 

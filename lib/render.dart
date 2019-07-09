@@ -17,7 +17,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
   StickyListItemRenderObject({
     @required ScrollableState scrollable,
     @required I itemIndex,
-    @required MinOffsetProvider<I> minOffsetProvider,
+    MinOffsetProvider<I> minOffsetProvider,
     StreamSink<StickyState<I>> streamSink,
     AlignmentGeometry alignment,
     TextDirection textDirection,
@@ -48,7 +48,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
     markNeedsPaint();
   }
 
-  MinOffsetProvider<I> get minOffsetProvider => _minOffsetProvider;
+  MinOffsetProvider<I> get minOffsetProvider => _minOffsetProvider ?? (state) => 0;
 
   set minOffsetProvider(MinOffsetProvider<I> offsetProvider) {
     _minOffsetProvider = offsetProvider;
