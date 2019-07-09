@@ -6,16 +6,18 @@ This package was made in order to make possible
 render infinite list in both directions with sticky headers, unlike most
 packages in Dart Pub.
 
-It highly customizable and doesn't have any third party dependencies.
+It highly customizable and doesn't have any third party dependencies or native(Android/iOS) code.
 
 In addition to default usage, this package exposes some classes, that
-can be overridden to use in default approach. Or it can be used independently
-from infinite list container.
+can be overridden if needed. Also some classes it can be used inside
+Scrollable widgets independently from `InfiniteList` container.
 
 This package uses `CustomScrollView` to perform scroll with all
 benefits for performance that Flutter provides.
 
-![Demo](https://github.com/TatsuUkraine/flutter_sticky_infinite_list/blob/master/docs/images/example.gif?raw=true)
+## Demo
+
+<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list/blob/master/docs/images/example.gif?raw=true" width="50%" />
 
 ## Getting Started
 
