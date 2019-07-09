@@ -76,9 +76,8 @@ class _MyHomePageState extends State<MyHomePage> {
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
         child: InfiniteList(
-          direction: InfiniteListDirection.reverse,
-            maxChildCount: 0,
-            minChildCount: -50,
+          direction: InfiniteListDirection.multi,
+            minChildCount: -5,
             builder: (context, index) => InfiniteListItem(
                 headerBuilder: (context) => Container(
                   height: 50,

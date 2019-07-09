@@ -5,20 +5,20 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import './state.dart';
 
-class ListItemRenderObject extends RenderStack {
+class StickyListItemRenderObject<I> extends RenderStack {
   ScrollableState _scrollable;
-  StreamSink<StickyState> _streamSink;
-  int _itemIndex;
-  MinOffsetProvider _minOffsetProvider;
+  StreamSink<StickyState<I>> _streamSink;
+  I _itemIndex;
+  MinOffsetProvider<I> _minOffsetProvider;
 
   double _lastOffset;
   bool _headerOverflow = false;
 
-  ListItemRenderObject({
+  StickyListItemRenderObject({
     @required ScrollableState scrollable,
-    @required streamSink,
-    @required itemIndex,
-    @required minOffsetProvider,
+    @required I itemIndex,
+    @required MinOffsetProvider<I> minOffsetProvider,
+    StreamSink<StickyState<I>> streamSink,
     AlignmentGeometry alignment,
     TextDirection textDirection,
     StackFit fit,
@@ -34,23 +34,23 @@ class ListItemRenderObject extends RenderStack {
         overflow: overflow,
       );
 
-  StreamSink<StickyState> get streamSink => _streamSink;
+  StreamSink<StickyState<I>> get streamSink => _streamSink;
 
-  set streamSink(StreamSink<StickyState> sink) {
+  set streamSink(StreamSink<StickyState<I>> sink) {
     _streamSink = sink;
     markNeedsPaint();
   }
 
-  int get itemIndex => _itemIndex;
+  I get itemIndex => _itemIndex;
 
-  set itemIndex(int index) {
+  set itemIndex(I index) {
     _itemIndex = index;
     markNeedsPaint();
   }
 
-  MinOffsetProvider get minOffsetProvider => _minOffsetProvider;
+  MinOffsetProvider<I> get minOffsetProvider => _minOffsetProvider;
 
-  set minOffsetProvider(MinOffsetProvider offsetProvider) {
+  set minOffsetProvider(MinOffsetProvider<I> offsetProvider) {
     _minOffsetProvider = offsetProvider;
     markNeedsPaint();
   }
@@ -126,7 +126,7 @@ class ListItemRenderObject extends RenderStack {
     final double offset = max(0.0, min(-stuckOffset, contentHeight));
     final double position = offset/contentHeight;
 
-    final StickyState state = StickyState(
+    final StickyState state = StickyState<I>(
       itemIndex,
       position: position,
       offset: offset,
@@ -141,7 +141,7 @@ class ListItemRenderObject extends RenderStack {
     if (_lastOffset != offset) {
       _lastOffset = offset;
 
-      streamSink.add(state.copyWith(
+      streamSink?.add(state.copyWith(
         sticky: stuckOffset < 0 && maxOffset + stuckOffset > 0,
       ));
     }

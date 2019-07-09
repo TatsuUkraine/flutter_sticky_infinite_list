@@ -5,24 +5,24 @@ import 'package:flutter/widgets.dart';
 import './state.dart';
 import './render.dart';
 
-typedef InfiniteListItem ItemBuilder(BuildContext context, int index);
+typedef InfiniteListItem<I> ItemBuilder<I>(BuildContext context, I index);
 
 /// List item build should return instance on this class
 ///
 /// It can be overriden if needed
 ///
 /// This class build item header and content
-class InfiniteListItem {
-  final HeaderStateBuilder headerStateBuilder;
+class InfiniteListItem<I> {
+  final HeaderStateBuilder<I> headerStateBuilder;
   final HeaderBuilder headerBuilder;
   final ContentBuilder contentBuilder;
-  final MinOffsetProvider _minOffsetProvider;
+  final MinOffsetProvider<I> _minOffsetProvider;
 
   InfiniteListItem({
     @required this.contentBuilder,
     this.headerBuilder,
     this.headerStateBuilder,
-    MinOffsetProvider minOffsetProvider,
+    MinOffsetProvider<I> minOffsetProvider,
   }): _minOffsetProvider = minOffsetProvider;
 
   /// Function, that provides min offset.
@@ -31,7 +31,7 @@ class InfiniteListItem {
   /// Header will be stick to bottom
   ///
   /// By default header positioned until it's offset less than content height
-  MinOffsetProvider get minOffsetProvider => _minOffsetProvider ?? (state) => 0;
+  MinOffsetProvider<I> get minOffsetProvider => _minOffsetProvider ?? (state) => 0;
 
   bool get hasStickyHeader => headerBuilder != null || headerStateBuilder != null;
 
@@ -43,7 +43,7 @@ class InfiniteListItem {
   /// If [headerBuilder] and [headerStateBuilder] not specified, this method won't be called
   ///
   /// Second param [StickyState] will be passed if [watchStickyState] is `TRUE`
-  Widget buildHeader(BuildContext context, [StickyState state]) {
+  Widget buildHeader(BuildContext context, [StickyState<I> state]) {
     if (state == null) {
       return headerBuilder(context);
     }
@@ -65,7 +65,7 @@ class InfiniteListItem {
   @mustCallSuper
   void dispose() {}
 
-  Widget _getHeader(BuildContext context, Stream<StickyState> stream) {
+  Widget _getHeader(BuildContext context, Stream<StickyState<I>> stream) {
     assert(hasStickyHeader, "At least one builder should be provided");
 
     if (!watchStickyState) {
@@ -73,7 +73,7 @@ class InfiniteListItem {
     }
 
     return Positioned(
-      child: StreamBuilder<StickyState>(
+      child: StreamBuilder<StickyState<I>>(
         stream: stream,
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
@@ -89,7 +89,7 @@ class InfiniteListItem {
 
 
 class InfiniteList extends StatefulWidget {
-  final ItemBuilder builder;
+  final ItemBuilder<int> builder;
   final ScrollController controller;
   final Key _centerKey;
   final InfiniteListDirection direction;
@@ -112,7 +112,7 @@ class InfiniteList extends StatefulWidget {
 }
 
 class _InfiniteListState extends State<InfiniteList> {
-  StreamController<StickyState> _streamController = StreamController<StickyState>.broadcast();
+  StreamController<StickyState> _streamController = StreamController<StickyState<int>>.broadcast();
 
   int get _reverseChildCount => widget.minChildCount == null ? null : widget.minChildCount * -1;
 
@@ -131,7 +131,7 @@ class _InfiniteListState extends State<InfiniteList> {
     key: widget._centerKey,
   );
 
-  Widget _getListItem(BuildContext context, int index) => _StickyListItem(
+  Widget _getListItem(BuildContext context, int index) => _StickySliverListItem<int>(
     streamController: _streamController,
     index: index,
     listItem: widget.builder(context, index),
@@ -167,6 +167,7 @@ class _InfiniteListState extends State<InfiniteList> {
   );
 
   @override
+  @mustCallSuper
   void dispose() {
     super.dispose();
 
@@ -175,14 +176,14 @@ class _InfiniteListState extends State<InfiniteList> {
 }
 
 
-class _StickyListItem extends StatefulWidget {
-  final InfiniteListItem listItem;
-  final int index;
-  final StreamController<StickyState> streamController;
+class _StickySliverListItem<I> extends StatefulWidget {
+  final InfiniteListItem<I> listItem;
+  final I index;
+  final StreamController<StickyState<I>> streamController;
 
-  Stream<StickyState> get _stream => streamController.stream.where((state) => state.index == index);
+  Stream<StickyState<I>> get _stream => streamController.stream.where((state) => state.index == index);
 
-  _StickyListItem({
+  _StickySliverListItem({
     Key key,
     this.index,
     this.listItem,
@@ -190,10 +191,10 @@ class _StickyListItem extends StatefulWidget {
   }): super(key: key);
 
   @override
-  State<_StickyListItem> createState() => _StickyListItemState();
+  State<_StickySliverListItem<I>> createState() => _StickySliverListItemState<I>();
 }
 
-class _StickyListItemState extends State<_StickyListItem> {
+class _StickySliverListItemState<I> extends State<_StickySliverListItem<I>> {
 
   @override
   void initState() {
@@ -210,7 +211,7 @@ class _StickyListItemState extends State<_StickyListItem> {
       return content;
     }
 
-    return _ListItemStack(
+    return StickyListItem<I>(
       itemIndex: widget.index,
       streamSink: widget.streamController.sink,
       header: widget.listItem._getHeader(context, widget._stream),
@@ -229,18 +230,18 @@ class _StickyListItemState extends State<_StickyListItem> {
 }
 
 
-class _ListItemStack extends Stack {
-  final StreamSink<StickyState> streamSink;
+class StickyListItem<I> extends Stack {
+  final StreamSink<StickyState<I>> streamSink;
 
-  final int itemIndex;
-  final MinOffsetProvider minOffsetProvider;
+  final I itemIndex;
+  final MinOffsetProvider<I> minOffsetProvider;
 
-  _ListItemStack({
+  StickyListItem({
     @required Widget header,
     @required Widget content,
-    @required this.streamSink,
     @required this.itemIndex,
     @required this.minOffsetProvider,
+    this.streamSink,
     Key key,
   }): super(
     key: key,
@@ -252,7 +253,7 @@ class _ListItemStack extends Stack {
   ScrollableState _getScrollableState(BuildContext context) => Scrollable.of(context);
 
   @override
-  RenderStack createRenderObject(BuildContext context) => ListItemRenderObject(
+  RenderStack createRenderObject(BuildContext context) => StickyListItemRenderObject<I>(
     scrollable: _getScrollableState(context),
     alignment: alignment,
     textDirection: textDirection ?? Directionality.of(context),
@@ -264,7 +265,7 @@ class _ListItemStack extends Stack {
   );
 
   @override
-  void updateRenderObject(BuildContext context, ListItemRenderObject renderObject) {
+  void updateRenderObject(BuildContext context, StickyListItemRenderObject<I> renderObject) {
     super.updateRenderObject(context, renderObject);
 
     renderObject
