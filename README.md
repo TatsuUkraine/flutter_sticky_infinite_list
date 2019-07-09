@@ -38,7 +38,7 @@ Package exposes `InfiniteList`, `InfiniteListItem`, `StickyListItem`,
 To start using Infinite list with sticky headers,
 you need to create instance `InfiniteList` with builder specified.
 
-No need any addition config to make it work
+No need to specify any additional config to make it work
 
 ```dart
 
