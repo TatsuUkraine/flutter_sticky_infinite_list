@@ -15,7 +15,7 @@ from infinite list container.
 This package uses `CustomScrollView` to perform scroll with all
 benefits for performance that Flutter provides.
 
-![Demo](/TatsuUkraine/flutter_sticky_infinite_list/blob/master/docs/images/example.gif?raw=true)
+![Demo](https://github.com/TatsuUkraine/flutter_sticky_infinite_list/blob/master/docs/images/example.gif?raw=true)
 
 ## Getting Started
 
