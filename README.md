@@ -183,7 +183,7 @@ class SomeCustomListItem extends InfiniteListItem<I> {
  please create an issue**
 
 Alongside with list item override, to use inside `InfiniteList` builder,
-you can also use `StickyListItem` independently from this package.
+you can also use `StickyListItem`, that exposed by this package too, independently.
 
 This class uses `Stream` to inform it's parent about header position changes
 
