@@ -1,14 +1,19 @@
 import 'package:flutter/widgets.dart';
 
 typedef Widget ContentBuilder(BuildContext context);
-typedef Widget HeaderStateBuilder(BuildContext context, StickyState state);
+typedef Widget HeaderStateBuilder<I>(BuildContext context, StickyState<I> state);
 typedef Widget HeaderBuilder(BuildContext context);
-typedef double MinOffsetProvider(StickyState state);
+typedef double MinOffsetProvider<I>(StickyState<I> state);
 
-class StickyState {
+enum InfiniteListDirection {
+  single,
+  multi,
+}
+
+class StickyState<I> {
   final double position;
   final double offset;
-  final int index;
+  final I index;
   final bool sticky;
   final double contentHeight;
 
@@ -19,12 +24,12 @@ class StickyState {
     this.contentHeight
   });
 
-  StickyState copyWith({
+  StickyState<I> copyWith({
     double position,
     double offset,
     bool sticky,
     double contentHeight
-  }) => StickyState(
+  }) => StickyState<I>(
     index,
     position: position ?? this.position,
     offset: offset ?? this.offset,

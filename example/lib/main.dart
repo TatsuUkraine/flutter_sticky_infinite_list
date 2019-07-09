@@ -1,4 +1,8 @@
+import 'dart:async';
+
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:sticky_infinite_list/sticky_infinite_list.dart';
 
 void main() => runApp(MyApp());
 
@@ -44,68 +48,210 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+  final StreamController<Settings> _streamController = StreamController<Settings>.broadcast();
+  final ScrollController _scrollController = ScrollController();
+  Settings _settings = Settings();
 
   @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(
+      title: Text(widget.title),
+    ),
+    body: Column(
+      children: <Widget>[
+        Container(
+          child: ExpansionTile(
+            title: Text("Settings"),
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: Column(
+                  children: <Widget>[
+                    SwitchListTile(
+                      title: Text("Render negative infinite list"),
+                      value: _settings.multiDirection,
+                      onChanged: (value) {
+                        setState(() {
+                          _settings.multiDirection = value;
+                        });
+                      },
+                    ),
+                    ListTile(
+                      title: Text("Max number of items"),
+                      trailing: DropdownButton<int>(
+                        value: _settings.maxCount == null ? 0 : _settings.maxCount,
+                        items: [
+                          DropdownMenuItem(
+                            child: Text("Infinite"),
+                            value: 0,
+                          ),
+                        ]..addAll(
+                            [10, 20, 30, 40].map((value) => DropdownMenuItem(
+                                child: Text(value.toString()),
+                                value: value
+                            ))
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            _settings.maxCount = value == 0 ? null : value;
+                          });
+                        },
+                      ),
+                    ),
+                    ListTile(
+                      title: Text("Min number of items"),
+                      trailing: DropdownButton<int>(
+                        value: _settings.minCount == null ? 0 : _settings.minCount,
+                        items: [
+                          DropdownMenuItem(
+                            child: Text("Infinite"),
+                            value: 0,
+                          ),
+                        ]..addAll(
+                            [-10, -20, -30, -40].map((value) => DropdownMenuItem(
+                                child: Text(value.toString()),
+                                value: value
+                            ))
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            _settings.minCount = value == 0 ? null : value;
+                          });
+                        },
+                      ),
+                    ),
+                    Center(
+                      child: RaisedButton(
+                        child: Text("Scroll to center"),
+                        onPressed: () {
+                          _scrollController.animateTo(
+                              0,
+                              duration: Duration(seconds: 1),
+                              curve: Curves.linearToEaseOut,
+                          );
+                        }
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          )
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+        Flexible(
+          child: ScrollWidget(
+            settings: _settings,
+            scrollController: _scrollController,
+            stream: _streamController.stream,
+          ),
+        )
+      ],
+    ),
+  );
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    _streamController.close();
   }
+}
+
+class ScrollWidget extends StatelessWidget {
+  final Stream<Settings> stream;
+  final ScrollController scrollController;
+  final Settings settings;
+
+  const ScrollWidget({
+    Key key,
+    this.stream,
+    this.scrollController,
+    this.settings,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => InfiniteList(
+    controller: scrollController,
+    direction: settings.multiDirection ? InfiniteListDirection.multi : InfiniteListDirection.single,
+    minChildCount: settings.minCount,
+    maxChildCount: settings.maxCount,
+    builder: (context, index) {
+      final date = DateTime.now().add(
+          Duration(
+            days: index,
+          )
+      );
+
+      return InfiniteListItem(
+        headerStateBuilder: (context, state) {
+          return Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.orange.withOpacity(1 - state.position),
+            ),
+            height: 70,
+            width: 70,
+            margin: EdgeInsets.symmetric(horizontal: 10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  date.day.toString(),
+                  style: TextStyle(
+                    fontSize: 21,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  DateFormat.MMM().format(date),
+                  style: TextStyle(
+                    height: .7,
+                    fontSize: 17,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w400,
+                  ),
+                )
+              ],
+            ),
+          );
+        },
+        contentBuilder: (context) => Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.blueAccent,
+          ),
+          margin: EdgeInsets.only(
+            left: 90,
+            bottom: 10,
+            right: 10,
+          ),
+          padding: EdgeInsets.all(8),
+          height: 300,
+          width: double.infinity,
+          child: Text(
+            DateFormat.yMMMMd().format(date),
+            style: TextStyle(
+                fontSize: 18,
+                color: Colors.white
+            ),
+          ),
+        ),
+        minOffsetProvider: (state) => 80,
+      );
+    },
+  );
+
+}
+
+class Settings {
+  int minCount;
+  int maxCount;
+  bool multiDirection;
+
+  Settings({
+    this.minCount,
+    this.maxCount,
+    this.multiDirection = false,
+  });
 }

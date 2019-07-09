@@ -5,25 +5,17 @@ import 'package:flutter/widgets.dart';
 import './state.dart';
 import './render.dart';
 
-typedef InfiniteListItem ItemBuilder(BuildContext context, int index);
+typedef InfiniteListItem<I> ItemBuilder<I>(BuildContext context, I index);
 
 /// List item build should return instance on this class
 ///
 /// It can be overriden if needed
 ///
 /// This class build item header and content
-class InfiniteListItem {
-  final HeaderStateBuilder headerStateBuilder;
+class InfiniteListItem<I> {
+  final HeaderStateBuilder<I> headerStateBuilder;
   final HeaderBuilder headerBuilder;
   final ContentBuilder contentBuilder;
-  final MinOffsetProvider _minOffsetProvider;
-
-  InfiniteListItem({
-    @required this.contentBuilder,
-    this.headerBuilder,
-    this.headerStateBuilder,
-    MinOffsetProvider minOffsetProvider,
-  }): _minOffsetProvider = minOffsetProvider;
 
   /// Function, that provides min offset.
   ///
@@ -31,7 +23,14 @@ class InfiniteListItem {
   /// Header will be stick to bottom
   ///
   /// By default header positioned until it's offset less than content height
-  MinOffsetProvider get minOffsetProvider => _minOffsetProvider ?? (state) => 0;
+  final MinOffsetProvider<I> minOffsetProvider;
+
+  InfiniteListItem({
+    @required this.contentBuilder,
+    this.headerBuilder,
+    this.headerStateBuilder,
+    this.minOffsetProvider,
+  });
 
   bool get hasStickyHeader => headerBuilder != null || headerStateBuilder != null;
 
@@ -43,7 +42,7 @@ class InfiniteListItem {
   /// If [headerBuilder] and [headerStateBuilder] not specified, this method won't be called
   ///
   /// Second param [StickyState] will be passed if [watchStickyState] is `TRUE`
-  Widget buildHeader(BuildContext context, [StickyState state]) {
+  Widget buildHeader(BuildContext context, [StickyState<I> state]) {
     if (state == null) {
       return headerBuilder(context);
     }
@@ -65,7 +64,7 @@ class InfiniteListItem {
   @mustCallSuper
   void dispose() {}
 
-  Widget _getHeader(BuildContext context, Stream<StickyState> stream) {
+  Widget _getHeader(BuildContext context, Stream<StickyState<I>> stream) {
     assert(hasStickyHeader, "At least one builder should be provided");
 
     if (!watchStickyState) {
@@ -73,7 +72,7 @@ class InfiniteListItem {
     }
 
     return Positioned(
-      child: StreamBuilder<StickyState>(
+      child: StreamBuilder<StickyState<I>>(
         stream: stream,
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
@@ -87,17 +86,58 @@ class InfiniteListItem {
   }
 }
 
-
+/// Scrollable list
+///
+/// This widget renders [CustomScrollView] with 2 sliver list items
+///
+/// If [direction] is [InfiniteListDirection.single] it will render only forward
+/// sliver list item without center key
+///
+/// If [direction] is [InfiniteListDirection.multi] - both direction infinite list will be rendered
 class InfiniteList extends StatefulWidget {
-  final ItemBuilder builder;
+  /// Builder callback. It should return [InfiniteListItem] instance.
+  ///
+  /// This function is called during [SliverChildBuilderDelegate]
+  final ItemBuilder<int> builder;
+
+  /// Scroll controller
   final ScrollController controller;
-  final Key _centerKey = UniqueKey();
+
+  /// List direction
+  ///
+  /// By default [InfiniteListDirection.single]
+  ///
+  /// If [InfiniteListDirection.multi] is passed - will render infinite list in both directions
+  final InfiniteListDirection direction;
+
+  /// Max child count for positive direction list
+  final int maxChildCount;
+
+  /// Max child count for negative list direction
+  ///
+  /// Ignored when [direction] is [InfiniteListDirection.single]
+  ///
+  /// This value should have negative value in order to provide right calculation
+  /// for negative list
+  final int minChildCount;
+
+  /// Scroll direction
+  ///
+  /// Passes to [CustomScrollView.reverse]
+  final bool reverse = false;
+  final Key _centerKey;
 
   InfiniteList({
     Key key,
     @required this.builder,
     this.controller,
-  }): super(key: key);
+    this.direction = InfiniteListDirection.single,
+    this.maxChildCount,
+    this.minChildCount,
+    /// commented out for future improvement
+    //this.reverse = false,
+  }): _centerKey = (direction == InfiniteListDirection.multi) ? UniqueKey() : null,
+      super(key: key);
 
   @override
   State<StatefulWidget> createState() => _InfiniteListState();
@@ -105,36 +145,57 @@ class InfiniteList extends StatefulWidget {
 }
 
 class _InfiniteListState extends State<InfiniteList> {
-  StreamController<StickyState> _streamController = StreamController<StickyState>.broadcast();
+  StreamController<StickyState> _streamController = StreamController<StickyState<int>>.broadcast();
+
+  int get _reverseChildCount => widget.minChildCount == null ? null : widget.minChildCount * -1;
 
   SliverList get _reverseList => SliverList(
     delegate: SliverChildBuilderDelegate(
-          (BuildContext context, int index) => _getListItem(context, (index + 1) * -1),
+      (BuildContext context, int index) => _getListItem(context, (index + 1) * -1),
+      childCount: _reverseChildCount,
     ),
   );
 
   SliverList get _forwardList => SliverList(
-    delegate: SliverChildBuilderDelegate(_getListItem),
+    delegate: SliverChildBuilderDelegate(
+      _getListItem,
+      childCount: widget.maxChildCount,
+    ),
     key: widget._centerKey,
   );
 
-  Widget _getListItem(BuildContext context, int index) => _StickyListItem(
+  Widget _getListItem(BuildContext context, int index) => _StickySliverListItem<int>(
     streamController: _streamController,
     index: index,
     listItem: widget.builder(context, index),
   );
 
+  List<SliverList> get _slivers {
+    switch (widget.direction) {
+      case InfiniteListDirection.multi:
+        return [
+          _reverseList,
+          _forwardList,
+        ];
+
+      case InfiniteListDirection.single:
+      default:
+        return [
+          _forwardList,
+        ];
+    }
+  }
+
   @override
   Widget build(BuildContext context) => CustomScrollView(
     controller: widget.controller,
     center: widget._centerKey,
-    slivers: [
-      _reverseList,
-      _forwardList,
-    ],
+    slivers: _slivers,
+    reverse: widget.reverse
   );
 
   @override
+  @mustCallSuper
   void dispose() {
     super.dispose();
 
@@ -143,14 +204,14 @@ class _InfiniteListState extends State<InfiniteList> {
 }
 
 
-class _StickyListItem extends StatefulWidget {
-  final InfiniteListItem listItem;
-  final int index;
-  final StreamController<StickyState> streamController;
+class _StickySliverListItem<I> extends StatefulWidget {
+  final InfiniteListItem<I> listItem;
+  final I index;
+  final StreamController<StickyState<I>> streamController;
 
-  Stream<StickyState> get _stream => streamController.stream.where((state) => state.index == index);
+  Stream<StickyState<I>> get _stream => streamController.stream.where((state) => state.index == index);
 
-  _StickyListItem({
+  _StickySliverListItem({
     Key key,
     this.index,
     this.listItem,
@@ -158,10 +219,10 @@ class _StickyListItem extends StatefulWidget {
   }): super(key: key);
 
   @override
-  State<_StickyListItem> createState() => _StickyListItemState();
+  State<_StickySliverListItem<I>> createState() => _StickySliverListItemState<I>();
 }
 
-class _StickyListItemState extends State<_StickyListItem> {
+class _StickySliverListItemState<I> extends State<_StickySliverListItem<I>> {
 
   @override
   void initState() {
@@ -178,7 +239,7 @@ class _StickyListItemState extends State<_StickyListItem> {
       return content;
     }
 
-    return _ListItemStack(
+    return StickyListItem<I>(
       itemIndex: widget.index,
       streamSink: widget.streamController.sink,
       header: widget.listItem._getHeader(context, widget._stream),
@@ -196,19 +257,33 @@ class _StickyListItemState extends State<_StickyListItem> {
 
 }
 
+/// Sticky list item that provides header offset calculation
+///
+/// Max and min offset value are defined based on content height
+///
+/// Can be used separately from [InfiniteList] if needed
+class StickyListItem<I> extends Stack {
+  /// Stream sink object
+  ///
+  /// If provided - render object will emit event on each header offset change
+  final StreamSink<StickyState<I>> streamSink;
 
-class _ListItemStack extends Stack {
-  final StreamSink<StickyState> streamSink;
+  /// Value that will be used inside [StickyState] object
+  /// during stream event emit
+  final I itemIndex;
 
-  final int itemIndex;
-  final MinOffsetProvider minOffsetProvider;
+  /// Callback function that tells when header to stick to the bottom
+  final MinOffsetProvider<I> minOffsetProvider;
 
-  _ListItemStack({
+  final bool reverse;
+
+  StickyListItem({
     @required Widget header,
     @required Widget content,
-    @required this.streamSink,
     @required this.itemIndex,
-    @required this.minOffsetProvider,
+    this.minOffsetProvider,
+    this.streamSink,
+    this.reverse,
     Key key,
   }): super(
     key: key,
@@ -220,7 +295,7 @@ class _ListItemStack extends Stack {
   ScrollableState _getScrollableState(BuildContext context) => Scrollable.of(context);
 
   @override
-  RenderStack createRenderObject(BuildContext context) => ListItemRenderObject(
+  RenderStack createRenderObject(BuildContext context) => StickyListItemRenderObject<I>(
     scrollable: _getScrollableState(context),
     alignment: alignment,
     textDirection: textDirection ?? Directionality.of(context),
@@ -229,16 +304,19 @@ class _ListItemStack extends Stack {
     itemIndex: itemIndex,
     streamSink: streamSink,
     minOffsetProvider: minOffsetProvider,
+    reverse: reverse,
   );
 
   @override
-  void updateRenderObject(BuildContext context, ListItemRenderObject renderObject) {
+  @mustCallSuper
+  void updateRenderObject(BuildContext context, StickyListItemRenderObject<I> renderObject) {
     super.updateRenderObject(context, renderObject);
 
     renderObject
       ..scrollable = _getScrollableState(context)
       ..itemIndex = itemIndex
       ..streamSink = streamSink
-      ..minOffsetProvider = minOffsetProvider;
+      ..minOffsetProvider = minOffsetProvider
+      ..reverse = reverse;
   }
 }
