@@ -77,22 +77,22 @@ class _MyHomePageState extends State<MyHomePage> {
         // in the middle of the parent.
         child: InfiniteList(
           direction: InfiniteListDirection.single,
-            minChildCount: -5,
-            builder: (context, index) => InfiniteListItem(
-                headerBuilder: (context) => Container(
-                  height: 50,
-                  width: 50,
-                  color: Colors.redAccent,
-                  child: Text("Header #$index"),
-                ),
-                contentBuilder: (context) => Container(
-                  margin: EdgeInsets.only(left: 50),
-                  height: 300,
-                  width: double.infinity,
-                  color: Colors.blue,
-                  child: Text("Content #$index"),
-                ),
-            )
+          minChildCount: -5,
+          builder: (context, index) => InfiniteListItem(
+              headerBuilder: (context) => Container(
+                height: 50,
+                width: 50,
+                color: Colors.redAccent,
+                child: Text("Header #$index"),
+              ),
+              contentBuilder: (context) => Container(
+                margin: EdgeInsets.only(left: 50),
+                height: 300,
+                width: double.infinity,
+                color: Colors.blue,
+                child: Text("Content #$index"),
+              ),
+          )
         ),
       ),
     );

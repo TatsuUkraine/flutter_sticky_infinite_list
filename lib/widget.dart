@@ -124,7 +124,7 @@ class InfiniteList extends StatefulWidget {
   /// Scroll direction
   ///
   /// Passes to [CustomScrollView.reverse]
-  final bool reverse;
+  final bool reverse = false;
   final Key _centerKey;
 
   InfiniteList({
@@ -134,7 +134,8 @@ class InfiniteList extends StatefulWidget {
     this.direction = InfiniteListDirection.single,
     this.maxChildCount,
     this.minChildCount,
-    this.reverse,
+    /// commented out for future improvement
+    //this.reverse = false,
   }): _centerKey = (direction == InfiniteListDirection.multi) ? UniqueKey() : null,
       super(key: key);
 
@@ -190,6 +191,7 @@ class _InfiniteListState extends State<InfiniteList> {
     controller: widget.controller,
     center: widget._centerKey,
     slivers: _slivers,
+    reverse: widget.reverse
   );
 
   @override
@@ -273,12 +275,15 @@ class StickyListItem<I> extends Stack {
   /// Callback function that tells when header to stick to the bottom
   final MinOffsetProvider<I> minOffsetProvider;
 
+  final bool reverse;
+
   StickyListItem({
     @required Widget header,
     @required Widget content,
     @required this.itemIndex,
     this.minOffsetProvider,
     this.streamSink,
+    this.reverse,
     Key key,
   }): super(
     key: key,
@@ -299,6 +304,7 @@ class StickyListItem<I> extends Stack {
     itemIndex: itemIndex,
     streamSink: streamSink,
     minOffsetProvider: minOffsetProvider,
+    reverse: reverse,
   );
 
   @override
@@ -310,6 +316,7 @@ class StickyListItem<I> extends Stack {
       ..scrollable = _getScrollableState(context)
       ..itemIndex = itemIndex
       ..streamSink = streamSink
-      ..minOffsetProvider = minOffsetProvider;
+      ..minOffsetProvider = minOffsetProvider
+      ..reverse = reverse;
   }
 }

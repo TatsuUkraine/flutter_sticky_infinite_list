@@ -10,6 +10,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
   StreamSink<StickyState<I>> _streamSink;
   I _itemIndex;
   MinOffsetProvider<I> _minOffsetProvider;
+  bool _reverse;
 
   double _lastOffset;
   bool _headerOverflow = false;
@@ -23,10 +24,12 @@ class StickyListItemRenderObject<I> extends RenderStack {
     TextDirection textDirection,
     StackFit fit,
     Overflow overflow,
+    bool reverse = false,
   }): _scrollable = scrollable,
       _streamSink = streamSink,
       _itemIndex = itemIndex,
       _minOffsetProvider = minOffsetProvider,
+      _reverse = reverse,
       super(
         alignment: alignment,
         textDirection: textDirection,
@@ -69,6 +72,13 @@ class StickyListItemRenderObject<I> extends RenderStack {
       oldScrollable.widget.controller.removeListener(markNeedsPaint);
       newScrollable.widget.controller.addListener(markNeedsPaint);
     }
+  }
+
+  bool get reverse => _reverse;
+
+  set reverse(bool reverse) {
+    _reverse = reverse;
+    markNeedsPaint();
   }
 
   RenderBox get _headerBox => lastChild;
