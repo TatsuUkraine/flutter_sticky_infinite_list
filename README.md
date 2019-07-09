@@ -112,7 +112,7 @@ InfiniteListItem(
 For more info take a look at
 [Example](https://github.com/TatsuUkraine/flutter_sticky_infinite_list/tree/master/example) project
 
-#### Available for override
+### Available for override
 
 In most cases it will be enough to just use `InfiniteListItem`
 
@@ -177,7 +177,7 @@ class SomeCustomListItem extends InfiniteListItem<I> {
 }
 ```
 
-##### Need more override?.. Ok (not tested)
+#### Need more override?.. Ok (not tested)
 
 **If you get any problems with this type of override,
  please create an issue**
