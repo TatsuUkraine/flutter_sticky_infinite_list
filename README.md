@@ -15,7 +15,7 @@ from infinite list container.
 This package uses `CustomScrollView` to perform scroll with all
 benefits for performance that Flutter provides.
 
- /*image*/
+![Demo](/TatsuUkraine/flutter_sticky_infinite_list/blob/master/docs/images/example.gif?raw=true)
 
 ## Getting Started
 
@@ -198,7 +198,12 @@ Please see the [Changelog](https://github.com/TatsuUkraine/flutter_sticky_infini
 
 ## Bugs/Requests
 
-If you encounter any problems feel free to open an [issue](https://github.com/TatsuUkraine/flutter_sticky_infinite_list/issues).  .
+If you encounter any problems feel free to open an [issue](https://github.com/TatsuUkraine/flutter_sticky_infinite_list/issues).
 If you feel the library is missing a feature,
 please raise a ticket on Github and I'll look into it.
 Pull request are also welcome.
+
+## Known issues
+
+Currently this package can't work with reverse lists. I hope I will
+get enough time to implement this feature soon)
