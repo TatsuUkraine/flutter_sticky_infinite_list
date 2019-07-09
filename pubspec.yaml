@@ -1,8 +1,10 @@
 name: sticky_infinite_list
 description: Infinite list with sticky headers
 version: 1.0.0
-author:
-homepage:
+author: TatsuUkraine <tatsu.ukraine@gmail.com>
+homepage: https://github.com/TatsuUkraine/flutter_sticky_infinite_list
+repository: https://github.com/TatsuUkraine/flutter_sticky_infinite_list
+issue_tracker: https://github.com/TatsuUkraine/flutter_sticky_infinite_list/issues
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
