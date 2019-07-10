@@ -75,8 +75,48 @@ class Example extends StatelessWidget {
 
 #### Available configuration
 
-Alongside with minimal config to start using, `InfiniteListItem`
-allows you to specify more options for you customization.
+Alongside with minimal config to start using.
+
+`InfiniteList` allows you to define config for scroll list rendering
+
+```dart
+InfiniteList(
+  /// Optional parameter to pass ScrollController instance
+  controller: ScrollController(),
+  
+  /// Optional parameter
+  /// to specify scroll direction
+  /// 
+  /// By default scroll will be rendered with just positive
+  /// direction `InfiniteListDirection.forward`
+  /// 
+  /// If you need infinite list in both directions use `InfiniteListDirection.multi`
+  direction: InfiniteListDirection.multi,
+  
+  /// Min child count.
+  /// 
+  /// Will be used only when `direction: InfiniteListDirection.multi`
+  /// 
+  /// Accepts negative values only
+  minChildCount: -100,
+  
+  /// Max child count
+  /// 
+  /// Specifies number of elements for forward list
+  maxChildCount: 100,
+
+  /// Item builder
+  /// 
+  /// Should return `InfiniteListItem`
+  builder: (BuildContext context, int index) {
+    return InfiniteListItem(
+      //...
+    )
+  }
+)
+```
+ 
+`InfiniteListItem` allows you to specify more options for you customization.
 
 ```dart
 InfiniteListItem(
