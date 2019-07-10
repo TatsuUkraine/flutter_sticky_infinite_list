@@ -149,7 +149,11 @@ class StickyListItemRenderObject<I> extends RenderStack {
     );
 
     final double maxOffset = contentHeight - minOffsetProvider(state);
-    parentData.offset = Offset(0, max(0.0, min(-stuckOffset, maxOffset)));
+
+    parentData.offset = Offset(
+      parentData.offset.dx,
+      max(0.0, min(-stuckOffset, maxOffset))
+    );
 
     _headerOverflow = (offset + headerHeight >= contentHeight);
 

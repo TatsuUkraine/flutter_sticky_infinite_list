@@ -17,6 +17,14 @@ class InfiniteListItem<I> {
   final HeaderBuilder headerBuilder;
   final ContentBuilder contentBuilder;
 
+  /// Header alignment
+  ///
+  /// Currently it supports top left
+  /// and right alignment
+  ///
+  /// By default [HeaderAlignment.topLeft]
+  final HeaderAlignment headerAlignment;
+
   /// Function, that provides min offset.
   ///
   /// If Visible content offset if less than provided value
@@ -30,6 +38,7 @@ class InfiniteListItem<I> {
     this.headerBuilder,
     this.headerStateBuilder,
     this.minOffsetProvider,
+    this.headerAlignment = HeaderAlignment.topLeft,
   });
 
   bool get hasStickyHeader =>
@@ -108,7 +117,8 @@ class InfiniteList extends StatefulWidget {
   ///
   /// By default [InfiniteListDirection.single]
   ///
-  /// If [InfiniteListDirection.multi] is passed - will render infinite list in both directions
+  /// If [InfiniteListDirection.multi] is passed - will
+  /// render infinite list in both directions
   final InfiniteListDirection direction;
 
   /// Max child count for positive direction list
@@ -126,6 +136,7 @@ class InfiniteList extends StatefulWidget {
   ///
   /// Passes to [CustomScrollView.reverse]
   final bool reverse = false;
+
   final Key _centerKey;
 
   InfiniteList({
@@ -138,8 +149,7 @@ class InfiniteList extends StatefulWidget {
 
     /// commented out for future improvement
     //this.reverse = false,
-  })  : _centerKey =
-            (direction == InfiniteListDirection.multi) ? UniqueKey() : null,
+  })  : _centerKey = (direction == InfiniteListDirection.multi) ? UniqueKey() : null,
         super(key: key);
 
   @override
@@ -194,10 +204,11 @@ class _InfiniteListState extends State<InfiniteList> {
 
   @override
   Widget build(BuildContext context) => CustomScrollView(
-      controller: widget.controller,
-      center: widget._centerKey,
-      slivers: _slivers,
-      reverse: widget.reverse);
+    controller: widget.controller,
+    center: widget._centerKey,
+    slivers: _slivers,
+    reverse: widget.reverse
+  );
 
   @override
   @mustCallSuper
@@ -226,6 +237,26 @@ class _StickySliverListItem<I> extends StatefulWidget {
   @override
   State<_StickySliverListItem<I>> createState() =>
       _StickySliverListItemState<I>();
+
+  /// Maps sticky header alignment values
+  /// to [AlignmentDirectional] variant
+  AlignmentDirectional get alignment {
+    switch (listItem.headerAlignment) {
+      case HeaderAlignment.topLeft:
+        return AlignmentDirectional.topStart;
+
+      case HeaderAlignment.topRight:
+        return AlignmentDirectional.topEnd;
+
+//      case HeaderAlignment.bottomLeft:
+//        return AlignmentDirectional.bottomStart;
+//
+//      case HeaderAlignment.bottomRight:
+//        return AlignmentDirectional.bottomEnd;
+    }
+
+    return AlignmentDirectional.topStart;
+  }
 }
 
 class _StickySliverListItemState<I> extends State<_StickySliverListItem<I>> {
@@ -250,6 +281,7 @@ class _StickySliverListItemState<I> extends State<_StickySliverListItem<I>> {
       header: widget.listItem._getHeader(context, widget._stream),
       content: content,
       minOffsetProvider: widget.listItem.minOffsetProvider,
+      alignment: widget.alignment,
     );
   }
 
@@ -288,11 +320,12 @@ class StickyListItem<I> extends Stack {
     this.minOffsetProvider,
     this.streamSink,
     this.reverse,
+    AlignmentDirectional alignment,
     Key key,
   }) : super(
           key: key,
           children: [content, header],
-          alignment: AlignmentDirectional.topStart,
+          alignment: alignment,
           overflow: Overflow.clip,
         );
 

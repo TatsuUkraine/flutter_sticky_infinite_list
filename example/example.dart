@@ -17,11 +17,15 @@ class Example extends StatelessWidget {
       /// If it's not provided, scroll will be infinite in negative direction
       ///
       /// Will be ignored if [direction] is forward
+      ///
+      /// If it's `null`, list will be infinite
       minChildCount: -100,
 
       /// Render 100 elements in positive direction. `Optional`
       ///
       /// If it's not provided, scroll will be infinite in positive direction
+      ///
+      /// If it's `null`, list will be infinite
       maxChildCount: 100,
 
       /// Item builder
@@ -74,7 +78,19 @@ class Example extends StatelessWidget {
               color: Colors.blueAccent,
             );
           },
+
+          /// Min offset after which it
+          /// should stick to the bottom edge
+          /// of container
           minOffsetProvider: (StickyState<int> state) => 50,
+
+          /// Header alignment
+          ///
+          /// Currently it supports top left
+          /// and right alignments
+          ///
+          /// By default [HeaderAlignment.topLeft]
+          headerAlignment: HeaderAlignment.topLeft,
         );
       }
     );
