@@ -1,7 +1,8 @@
 import 'package:flutter/widgets.dart';
 
 typedef Widget ContentBuilder(BuildContext context);
-typedef Widget HeaderStateBuilder<I>(BuildContext context, StickyState<I> state);
+typedef Widget HeaderStateBuilder<I>(
+    BuildContext context, StickyState<I> state);
 typedef Widget HeaderBuilder(BuildContext context);
 typedef double MinOffsetProvider<I>(StickyState<I> state);
 

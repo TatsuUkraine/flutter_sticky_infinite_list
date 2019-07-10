@@ -32,7 +32,8 @@ class InfiniteListItem<I> {
     this.minOffsetProvider,
   });
 
-  bool get hasStickyHeader => headerBuilder != null || headerStateBuilder != null;
+  bool get hasStickyHeader =>
+      headerBuilder != null || headerStateBuilder != null;
 
   bool get watchStickyState => headerStateBuilder != null;
 
@@ -134,41 +135,46 @@ class InfiniteList extends StatefulWidget {
     this.direction = InfiniteListDirection.single,
     this.maxChildCount,
     this.minChildCount,
+
     /// commented out for future improvement
     //this.reverse = false,
-  }): _centerKey = (direction == InfiniteListDirection.multi) ? UniqueKey() : null,
-      super(key: key);
+  })  : _centerKey =
+            (direction == InfiniteListDirection.multi) ? UniqueKey() : null,
+        super(key: key);
 
   @override
   State<StatefulWidget> createState() => _InfiniteListState();
-
 }
 
 class _InfiniteListState extends State<InfiniteList> {
-  StreamController<StickyState> _streamController = StreamController<StickyState<int>>.broadcast();
+  StreamController<StickyState> _streamController =
+      StreamController<StickyState<int>>.broadcast();
 
-  int get _reverseChildCount => widget.minChildCount == null ? null : widget.minChildCount * -1;
+  int get _reverseChildCount =>
+      widget.minChildCount == null ? null : widget.minChildCount * -1;
 
   SliverList get _reverseList => SliverList(
-    delegate: SliverChildBuilderDelegate(
-      (BuildContext context, int index) => _getListItem(context, (index + 1) * -1),
-      childCount: _reverseChildCount,
-    ),
-  );
+        delegate: SliverChildBuilderDelegate(
+          (BuildContext context, int index) =>
+              _getListItem(context, (index + 1) * -1),
+          childCount: _reverseChildCount,
+        ),
+      );
 
   SliverList get _forwardList => SliverList(
-    delegate: SliverChildBuilderDelegate(
-      _getListItem,
-      childCount: widget.maxChildCount,
-    ),
-    key: widget._centerKey,
-  );
+        delegate: SliverChildBuilderDelegate(
+          _getListItem,
+          childCount: widget.maxChildCount,
+        ),
+        key: widget._centerKey,
+      );
 
-  Widget _getListItem(BuildContext context, int index) => _StickySliverListItem<int>(
-    streamController: _streamController,
-    index: index,
-    listItem: widget.builder(context, index),
-  );
+  Widget _getListItem(BuildContext context, int index) =>
+      _StickySliverListItem<int>(
+        streamController: _streamController,
+        index: index,
+        listItem: widget.builder(context, index),
+      );
 
   List<SliverList> get _slivers {
     switch (widget.direction) {
@@ -188,11 +194,10 @@ class _InfiniteListState extends State<InfiniteList> {
 
   @override
   Widget build(BuildContext context) => CustomScrollView(
-    controller: widget.controller,
-    center: widget._centerKey,
-    slivers: _slivers,
-    reverse: widget.reverse
-  );
+      controller: widget.controller,
+      center: widget._centerKey,
+      slivers: _slivers,
+      reverse: widget.reverse);
 
   @override
   @mustCallSuper
@@ -203,27 +208,27 @@ class _InfiniteListState extends State<InfiniteList> {
   }
 }
 
-
 class _StickySliverListItem<I> extends StatefulWidget {
   final InfiniteListItem<I> listItem;
   final I index;
   final StreamController<StickyState<I>> streamController;
 
-  Stream<StickyState<I>> get _stream => streamController.stream.where((state) => state.index == index);
+  Stream<StickyState<I>> get _stream =>
+      streamController.stream.where((state) => state.index == index);
 
   _StickySliverListItem({
     Key key,
     this.index,
     this.listItem,
     this.streamController,
-  }): super(key: key);
+  }) : super(key: key);
 
   @override
-  State<_StickySliverListItem<I>> createState() => _StickySliverListItemState<I>();
+  State<_StickySliverListItem<I>> createState() =>
+      _StickySliverListItemState<I>();
 }
 
 class _StickySliverListItemState<I> extends State<_StickySliverListItem<I>> {
-
   @override
   void initState() {
     super.initState();
@@ -254,7 +259,6 @@ class _StickySliverListItemState<I> extends State<_StickySliverListItem<I>> {
 
     widget.listItem.dispose();
   }
-
 }
 
 /// Sticky list item that provides header offset calculation
@@ -285,31 +289,34 @@ class StickyListItem<I> extends Stack {
     this.streamSink,
     this.reverse,
     Key key,
-  }): super(
-    key: key,
-    children: [content, header],
-    alignment: AlignmentDirectional.topStart,
-    overflow: Overflow.clip,
-  );
+  }) : super(
+          key: key,
+          children: [content, header],
+          alignment: AlignmentDirectional.topStart,
+          overflow: Overflow.clip,
+        );
 
-  ScrollableState _getScrollableState(BuildContext context) => Scrollable.of(context);
+  ScrollableState _getScrollableState(BuildContext context) =>
+      Scrollable.of(context);
 
   @override
-  RenderStack createRenderObject(BuildContext context) => StickyListItemRenderObject<I>(
-    scrollable: _getScrollableState(context),
-    alignment: alignment,
-    textDirection: textDirection ?? Directionality.of(context),
-    fit: fit,
-    overflow: overflow,
-    itemIndex: itemIndex,
-    streamSink: streamSink,
-    minOffsetProvider: minOffsetProvider,
-    reverse: reverse,
-  );
+  RenderStack createRenderObject(BuildContext context) =>
+      StickyListItemRenderObject<I>(
+        scrollable: _getScrollableState(context),
+        alignment: alignment,
+        textDirection: textDirection ?? Directionality.of(context),
+        fit: fit,
+        overflow: overflow,
+        itemIndex: itemIndex,
+        streamSink: streamSink,
+        minOffsetProvider: minOffsetProvider,
+        reverse: reverse,
+      );
 
   @override
   @mustCallSuper
-  void updateRenderObject(BuildContext context, StickyListItemRenderObject<I> renderObject) {
+  void updateRenderObject(
+      BuildContext context, StickyListItemRenderObject<I> renderObject) {
     super.updateRenderObject(context, renderObject);
 
     renderObject

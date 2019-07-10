@@ -25,17 +25,17 @@ class StickyListItemRenderObject<I> extends RenderStack {
     StackFit fit,
     Overflow overflow,
     bool reverse = false,
-  }): _scrollable = scrollable,
-      _streamSink = streamSink,
-      _itemIndex = itemIndex,
-      _minOffsetProvider = minOffsetProvider,
-      _reverse = reverse,
-      super(
-        alignment: alignment,
-        textDirection: textDirection,
-        fit: fit,
-        overflow: overflow,
-      );
+  })  : _scrollable = scrollable,
+        _streamSink = streamSink,
+        _itemIndex = itemIndex,
+        _minOffsetProvider = minOffsetProvider,
+        _reverse = reverse,
+        super(
+          alignment: alignment,
+          textDirection: textDirection,
+          fit: fit,
+          overflow: overflow,
+        );
 
   StreamSink<StickyState<I>> get streamSink => _streamSink;
 
@@ -51,7 +51,8 @@ class StickyListItemRenderObject<I> extends RenderStack {
     markNeedsPaint();
   }
 
-  MinOffsetProvider<I> get minOffsetProvider => _minOffsetProvider ?? (state) => 0;
+  MinOffsetProvider<I> get minOffsetProvider =>
+      _minOffsetProvider ?? (state) => 0;
 
   set minOffsetProvider(MinOffsetProvider<I> offsetProvider) {
     _minOffsetProvider = offsetProvider;
@@ -84,7 +85,8 @@ class StickyListItemRenderObject<I> extends RenderStack {
   RenderBox get _headerBox => lastChild;
   RenderBox get _contentBox => firstChild;
 
-  RevealedOffset get _viewportRevealedOffset => RenderAbstractViewport.of(this).getOffsetToReveal(this, 0);
+  RevealedOffset get _viewportRevealedOffset =>
+      RenderAbstractViewport.of(this).getOffsetToReveal(this, 0);
 
   @override
   void attach(PipelineOwner owner) {
@@ -108,14 +110,16 @@ class StickyListItemRenderObject<I> extends RenderStack {
   }
 
   @override
-  Rect describeApproximatePaintClip(RenderObject child) => _headerOverflow ? Offset.zero & size : null;
+  Rect describeApproximatePaintClip(RenderObject child) =>
+      _headerOverflow ? Offset.zero & size : null;
 
   @override
   void paint(PaintingContext context, Offset paintOffset) {
     updateHeaderOffset();
 
     if (overflow == Overflow.clip && _headerOverflow) {
-      context.pushClipRect(needsCompositing, paintOffset, Offset.zero & size, paintStack);
+      context.pushClipRect(
+          needsCompositing, paintOffset, Offset.zero & size, paintStack);
     } else {
       paintStack(context, paintOffset);
     }
@@ -131,10 +135,11 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
     final StackParentData parentData = _headerBox.parentData;
     final double headerHeight = _headerBox.size.height;
-    final double contentHeight = max(constraints.minHeight, _contentBox.size.height);
+    final double contentHeight =
+        max(constraints.minHeight, _contentBox.size.height);
 
     final double offset = max(0.0, min(-stuckOffset, contentHeight));
-    final double position = offset/contentHeight;
+    final double position = offset / contentHeight;
 
     final StickyState state = StickyState<I>(
       itemIndex,
