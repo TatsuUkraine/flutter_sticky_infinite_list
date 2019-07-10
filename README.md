@@ -100,11 +100,15 @@ InfiniteList(
   /// Will be used only when `direction: InfiniteListDirection.multi`
   /// 
   /// Accepts negative values only
+  /// 
+  /// If it's not provided, scroll will be infinite in negative direction
   minChildCount: -100,
   
   /// Max child count
   /// 
   /// Specifies number of elements for forward list
+  /// 
+  /// If it's not provided, scroll will be infinite in positive direction
   maxChildCount: 100,
 
   /// Item builder
