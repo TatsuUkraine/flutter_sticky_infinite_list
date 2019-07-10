@@ -1,5 +1,7 @@
 # Sticky Infinite List
 
+[![pub package](https://img.shields.io/pub/v/sticky_infinite_list.svg)](https://pub.dartlang.org/packages/sticky_infinite_list)
+
 Infinite list with sticky headers.
 
 This package was made in order to make possible
