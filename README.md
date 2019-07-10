@@ -100,11 +100,15 @@ InfiniteList(
   /// Will be used only when `direction: InfiniteListDirection.multi`
   /// 
   /// Accepts negative values only
+  /// 
+  /// If it's not provided, scroll will be infinite in negative direction
   minChildCount: -100,
   
   /// Max child count
   /// 
   /// Specifies number of elements for forward list
+  /// 
+  /// If it's not provided, scroll will be infinite in positive direction
   maxChildCount: 100,
 
   /// Item builder
@@ -150,6 +154,14 @@ InfiniteListItem(
   /// header will be in sticky state until list item
   /// will be visible inside view port
   minOffsetProvider: (StickyState<int> state) {},
+  
+  /// Header alignment
+  /// 
+  /// Use [HeaderAlignment] to align header to left
+  /// or right side
+  /// 
+  /// Optional. Default value [HeaderAlignment.topLeft]
+  headerAlignment: HeaderAlignment.topLeft,
 );
 ```
 
@@ -168,6 +180,14 @@ Luckily you can extend and override base `InfiniteListItem` class
 ```dart
 /// Generic `I` is index type, by default list item uses `int`
 class SomeCustomListItem extends InfiniteListItem<I> {
+  /// Header alignment
+  /// 
+  /// Currently it supports top left
+  /// and right alignment
+  /// 
+  /// By default [HeaderAlignment.topLeft]
+  final HeaderAlignment headerAlignment;
+  
   /// Let item builder know if it should watch
   /// header position changes
   /// 

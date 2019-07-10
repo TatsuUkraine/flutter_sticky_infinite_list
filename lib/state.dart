@@ -11,6 +11,14 @@ enum InfiniteListDirection {
   multi,
 }
 
+/// Alignment options
+enum HeaderAlignment {
+  topLeft,
+  topRight,
+//  bottomLeft,
+//  bottomRight,
+}
+
 class StickyState<I> {
   final double position;
   final double offset;
