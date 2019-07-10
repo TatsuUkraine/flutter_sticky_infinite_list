@@ -2,10 +2,7 @@ name: sticky_infinite_list
 description: >-
   Infinite list with sticky headers that can be rendered in both directions.
 
-  It highly customizable and doesn't have any third party dependencies or native(Android/iOS) code.
-
-  Alongside with default usage it provides ability to override
-  classes to extend it's usage.
+  Can be customized or with config options or with override
 
 version: 1.0.1
 author: TatsuUkraine <tatsu.ukraine@gmail.com>
