@@ -17,7 +17,7 @@ benefits for performance that Flutter provides.
 
 ## Demo
 
-<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list/blob/master/docs/images/example.gif?raw=true" width="50%" />
+<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/blob/master/doc/images/example.gif?raw=true" width="50%" />
 
 ## Getting Started
 
@@ -112,7 +112,7 @@ InfiniteListItem(
 ```
 
 For more info take a look at
-[Example](https://github.com/TatsuUkraine/flutter_sticky_infinite_list/tree/master/example) project
+[Example](https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example) project
 
 ### Available for override
 
