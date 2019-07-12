@@ -137,10 +137,8 @@ class StickyListItemRenderObject<I> extends RenderStack {
       contentSize: contentSize,
     );
 
-    print(itemIndex);
     final double headerOffset = _getHeaderOffset(state, stuckOffset, headerSize);
 
-    print(headerOffset);
     parentData.offset = Offset(
       parentData.offset.dx,
       headerOffset
