@@ -15,8 +15,8 @@ enum InfiniteListDirection {
 enum HeaderAlignment {
   topLeft,
   topRight,
-//  bottomLeft,
-//  bottomRight,
+  bottomLeft,
+  bottomRight,
 }
 
 class StickyState<I> {
@@ -24,13 +24,13 @@ class StickyState<I> {
   final double offset;
   final I index;
   final bool sticky;
-  final double contentHeight;
+  final double contentSize;
 
   StickyState(this.index, {
     this.position = 0,
     this.offset = 0,
     this.sticky = false,
-    this.contentHeight
+    this.contentSize
   });
 
   StickyState<I> copyWith({
@@ -43,6 +43,6 @@ class StickyState<I> {
     position: position ?? this.position,
     offset: offset ?? this.offset,
     sticky: sticky ?? this.sticky,
-    contentHeight: contentHeight ?? this.contentHeight,
+    contentSize: contentHeight ?? this.contentSize,
   );
 }

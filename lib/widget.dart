@@ -248,11 +248,11 @@ class _StickySliverListItem<I> extends StatefulWidget {
       case HeaderAlignment.topRight:
         return AlignmentDirectional.topEnd;
 
-//      case HeaderAlignment.bottomLeft:
-//        return AlignmentDirectional.bottomStart;
-//
-//      case HeaderAlignment.bottomRight:
-//        return AlignmentDirectional.bottomEnd;
+      case HeaderAlignment.bottomLeft:
+        return AlignmentDirectional.bottomStart;
+
+      case HeaderAlignment.bottomRight:
+        return AlignmentDirectional.bottomEnd;
     }
 
     return AlignmentDirectional.topStart;
