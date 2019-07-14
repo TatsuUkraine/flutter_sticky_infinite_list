@@ -6,33 +6,78 @@ typedef Widget HeaderStateBuilder<I>(
 typedef Widget HeaderBuilder(BuildContext context);
 typedef double MinOffsetProvider<I>(StickyState<I> state);
 
+/// List direction variants
 enum InfiniteListDirection {
+  /// Render only positive infinite list
   single,
+
+  /// Render both positive and negative infinite lists
   multi,
 }
 
 /// Alignment options
+///
+/// For [HeaderAlignment.bottomLeft] and [HeaderAlignment.bottomRight]
+/// header will be positioned against content bottom edge
+///
+/// Which also means that headers will become sticky, when content
+/// bottom edge will go outside of ViewPort bottom edge
+///
+/// It also affects on [StickyState.offset] value, since in that case
+/// hidden size will be calculated against bottom edges
 enum HeaderAlignment {
   topLeft,
   topRight,
-//  bottomLeft,
-//  bottomRight,
+  bottomLeft,
+  bottomRight,
 }
 
+/// Sticky state object
+/// that describes header position and content height
 class StickyState<I> {
+  /// Position, that header already passed
+  ///
+  /// Value can be between 0.0 and 1.0
+  ///
+  /// If it's `0.0` - sticky in max start position
+  ///
+  /// `1.0` - max end position
+  ///
+  /// If [InfiniteListItem.initialHeaderBuild] is true, initial
+  /// header render will be with position = 0
   final double position;
+
+  /// Number of pixels, that outside of viewport
+  ///
+  /// If [InfiniteListItem.initialHeaderBuild] is true, initial
+  /// header render will be with offset = 0
   final double offset;
+
+  /// Item index
   final I index;
+
+  /// If header is in sticky state
+  ///
+  /// If [InfiniteListItem.minOffsetProvider] is defined,
+  /// it could be that header builder will be emitted with new state
+  /// on scroll, but [sticky] will be false, if offset already passed
+  /// min offset value
   final bool sticky;
-  final double contentHeight;
+
+  /// Scroll item height.
+  ///
+  /// If [InfiniteListItem.initialHeaderBuild] is true, initial
+  /// header render will be called without this value
+  final double contentSize;
 
   StickyState(this.index, {
     this.position = 0,
     this.offset = 0,
     this.sticky = false,
-    this.contentHeight
+    this.contentSize
   });
 
+  /// Create state duplicate, with optional state options override
   StickyState<I> copyWith({
     double position,
     double offset,
@@ -43,6 +88,6 @@ class StickyState<I> {
     position: position ?? this.position,
     offset: offset ?? this.offset,
     sticky: sticky ?? this.sticky,
-    contentHeight: contentHeight ?? this.contentHeight,
+    contentSize: contentHeight ?? this.contentSize,
   );
 }

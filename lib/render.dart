@@ -10,7 +10,6 @@ class StickyListItemRenderObject<I> extends RenderStack {
   StreamSink<StickyState<I>> _streamSink;
   I _itemIndex;
   MinOffsetProvider<I> _minOffsetProvider;
-  bool _reverse;
 
   double _lastOffset;
   bool _headerOverflow = false;
@@ -24,12 +23,10 @@ class StickyListItemRenderObject<I> extends RenderStack {
     TextDirection textDirection,
     StackFit fit,
     Overflow overflow,
-    bool reverse = false,
   })  : _scrollable = scrollable,
         _streamSink = streamSink,
         _itemIndex = itemIndex,
         _minOffsetProvider = minOffsetProvider,
-        _reverse = reverse,
         super(
           alignment: alignment,
           textDirection: textDirection,
@@ -75,18 +72,10 @@ class StickyListItemRenderObject<I> extends RenderStack {
     }
   }
 
-  bool get reverse => _reverse;
-
-  set reverse(bool reverse) {
-    _reverse = reverse;
-    markNeedsPaint();
-  }
-
   RenderBox get _headerBox => lastChild;
   RenderBox get _contentBox => firstChild;
 
-  RevealedOffset get _viewportRevealedOffset =>
-      RenderAbstractViewport.of(this).getOffsetToReveal(this, 0);
+  RenderViewport get _viewport => RenderAbstractViewport.of(this);
 
   @override
   void attach(PipelineOwner owner) {
@@ -98,15 +87,6 @@ class StickyListItemRenderObject<I> extends RenderStack {
   void detach() {
     scrollable.widget.controller.removeListener(markNeedsPaint);
     super.detach();
-  }
-
-  double _getStuckOffset() {
-    final scrollBox = scrollable.context.findRenderObject();
-    if (scrollBox?.attached ?? false) {
-      return _viewportRevealedOffset.offset - _scrollable.position.pixels;
-    }
-
-    return null;
   }
 
   @override
@@ -127,42 +107,102 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
   void updateHeaderOffset() {
     _headerOverflow = false;
-    final double stuckOffset = _getStuckOffset();
 
-    if (stuckOffset == null) {
-      return;
-    }
+    final double stuckOffset = _stuckOffset;
 
     final StackParentData parentData = _headerBox.parentData;
-    final double headerHeight = _headerBox.size.height;
-    final double contentHeight =
-        max(constraints.minHeight, _contentBox.size.height);
+    final double contentSize = _getContentDirectionSize();
+    final double headerSize = _getHeaderDirectionSize();
 
-    final double offset = max(0.0, min(-stuckOffset, contentHeight));
-    final double position = offset / contentHeight;
+    final double offset = _getStateOffset(stuckOffset, contentSize);
+    final double position = offset / contentSize;
 
     final StickyState state = StickyState<I>(
       itemIndex,
       position: position,
       offset: offset,
-      contentHeight: contentHeight,
+      contentSize: contentSize,
     );
 
-    final double maxOffset = contentHeight - minOffsetProvider(state);
+    final double headerOffset = _getHeaderOffset(state, stuckOffset, headerSize);
 
     parentData.offset = Offset(
       parentData.offset.dx,
-      max(0.0, min(-stuckOffset, maxOffset))
+      headerOffset
+        //max(maxOffset, min(-stuckOffset, contentHeight)) - headerHeight
     );
 
-    _headerOverflow = (offset + headerHeight >= contentHeight);
+    _headerOverflow = _isHeaderOverflow(headerOffset, headerSize, contentSize);
 
     if (_lastOffset != offset) {
       _lastOffset = offset;
 
-      streamSink?.add(state.copyWith(
-        sticky: stuckOffset < 0 && maxOffset + stuckOffset > 0,
-      ));
+      //todo: define when header sticky
+      streamSink?.add(state);
     }
+  }
+
+  bool get _alignmentStart {
+    return [AlignmentDirectional.topStart, AlignmentDirectional.topEnd].contains(alignment);
+  }
+
+  double get _scrollableSize {
+    final viewportSize = _viewport.size.height;
+
+    if (_alignmentStart) {
+      return -viewportSize * _viewport.anchor;
+    }
+
+    return viewportSize - viewportSize * _viewport.anchor;
+  }
+
+  double get _stuckOffset {
+      return _viewport.getOffsetToReveal(this, 0).offset - _viewport.offset.pixels - _scrollableSize;
+  }
+
+  double _getContentDirectionSize() {
+    return _contentBox.size.height;
+  }
+
+  double _getHeaderDirectionSize() {
+    return _headerBox.size.height;
+  }
+
+  double _getStateOffset(double stuckOffset, double contentSize) {
+    double offset = _getOffset(stuckOffset, 0, contentSize);
+
+    if (_alignmentStart) {
+      return offset;
+    }
+
+    return contentSize - offset;
+  }
+
+  double _getHeaderOffset(StickyState<I> state, double stuckOffset, double headerSize) {
+    final double minOffset = _getMinOffset(state);
+
+    if (_alignmentStart) {
+      return _getOffset(stuckOffset, 0, minOffset);
+    }
+
+    return _getOffset(stuckOffset, minOffset, state.contentSize) - headerSize;
+  }
+
+  double _getOffset(double current, double minPosition, double maxPosition) {
+    return max(minPosition, min(-current, maxPosition));
+  }
+
+  double _getMinOffset(StickyState<I> state) {
+    double minOffset = minOffsetProvider(state);
+
+    if (_alignmentStart) {
+      return state.contentSize - minOffset;
+    }
+
+    return minOffset;
+  }
+
+  bool _isHeaderOverflow(double headerOffset, double headerSize, double contentSize) {
+    return headerOffset < 0 || headerOffset + headerSize > contentSize;
   }
 }

@@ -1,8 +1,9 @@
 name: sticky_infinite_list
 description: >-
-  Infinite list with sticky headers that can be rendered in both directions.
+  Infinite list with sticky headers that can be rendered in both directions
+  or in reverse direction.
 
-  Can be customized or with config options or with override
+  Can be customized or with config options or with override.
 
 version: 1.0.2
 author: TatsuUkraine <tatsu.ukraine@gmail.com>
