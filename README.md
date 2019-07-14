@@ -110,6 +110,9 @@ InfiniteList(
   /// 
   /// If it's not provided, scroll will be infinite in positive direction
   maxChildCount: 100,
+  
+  /// ScrollView anchor value.
+  anchor: 0.0,
 
   /// Item builder
   /// 
@@ -126,6 +129,12 @@ InfiniteList(
 
 ```dart
 InfiniteListItem(
+  /// See class description for more info
+  /// 
+  /// Forces initial header render when [headerStateBuilder]
+  /// is specified.
+  initialHeaderBuild: false,
+
   /// Simple Header builder
   /// that will be called once during List item render
   headerBuilder: (BuildContext context) {},
@@ -164,6 +173,59 @@ InfiniteListItem(
   headerAlignment: HeaderAlignment.topLeft,
 );
 ```
+
+### Reverse infinite scroll
+
+Currently package doesn't support `CustomScrollView.reverse` option.
+
+But same result can be achieved with defining `anchor = 1` and
+`maxChildCount = 0`. In that way viewport center will be stick
+to the bottom and positive list won't render anything.
+
+Additionally you can specify `headerAlignment` to any side.
+
+```dart
+import 'package:sticky_infinite_list/sticky_infinite_list.dart';
+
+class Example extends StatelessWidget {
+  
+  @override
+  Widget build(BuildContext context) {
+    return InfiniteList(
+      anchor: 1.0,
+      
+      direction: InfiniteListDirection.multi,
+      
+      maxChildCount: 0,
+      
+      builder: (BuildContext context, int index) {
+        /// Builder requires [InfiniteList] to be returned
+        return InfiniteListItem(
+        
+          headerAlignment: HeaderAlignment.bottomLeft,
+          
+          /// Header builder
+          headerBuilder: (BuildContext context) {
+            return Container(
+              ///...
+            );
+          },
+          /// Content builder
+          contentBuilder: (BuildContext context) {
+            return Container(
+              ///...
+            );
+          },
+        );
+      }
+    );
+  }
+}
+``` 
+
+#### Demo
+
+<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/blob/master/doc/images/reverse.gif?raw=true" width="50%" />
 
 For more info take a look at
 [Example](https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example) project
