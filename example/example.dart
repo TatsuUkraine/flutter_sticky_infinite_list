@@ -28,10 +28,18 @@ class Example extends StatelessWidget {
       /// If it's `null`, list will be infinite
       maxChildCount: 100,
 
+      /// ViewPort anchor value. See [ScrollView] docs for more info
+      anchor: 0.0,
+
       /// Item builder
       builder: (BuildContext context, int index) {
         /// Builder requires [InfiniteList] to be returned
         return InfiniteListItem(
+          /// If header should be build during initial render.
+          ///
+          /// Will be ignored with just [headerBuilder] builder specified
+          initialHeaderBuild: true,
+
           /// Header builder with state
           ///
           /// Will be invoked each time header changes it's position
@@ -86,11 +94,13 @@ class Example extends StatelessWidget {
 
           /// Header alignment
           ///
-          /// Currently it supports top left
-          /// and right alignments
+          /// Currently it supports top left,
+          /// top right, bottom left and bottom right alignments
           ///
           /// By default [HeaderAlignment.topLeft]
           headerAlignment: HeaderAlignment.topLeft,
+
+
         );
       }
     );
