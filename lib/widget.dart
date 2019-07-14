@@ -132,10 +132,14 @@ class InfiniteList extends StatefulWidget {
   /// for negative list
   final int minChildCount;
 
-  /// Scroll direction
-  ///
-  /// Passes to [CustomScrollView.reverse]
+  /// Proxy property for [ScrollView.reverse]
   final bool reverse = false;
+
+  /// Proxy property for [ScrollView.anchor]
+  final double anchor;
+
+  /// Proxy property for [RenderViewportBase.cacheExtent]
+  final double cacheExtent;
 
   final Key _centerKey;
 
@@ -146,9 +150,9 @@ class InfiniteList extends StatefulWidget {
     this.direction = InfiniteListDirection.single,
     this.maxChildCount,
     this.minChildCount,
-
-    /// commented out for future improvement
     //this.reverse = false,
+    this.anchor = 0.0,
+    this.cacheExtent,
   })  : _centerKey = (direction == InfiniteListDirection.multi) ? UniqueKey() : null,
         super(key: key);
 
@@ -163,7 +167,8 @@ class _InfiniteListState extends State<InfiniteList> {
   int get _reverseChildCount =>
       widget.minChildCount == null ? null : widget.minChildCount * -1;
 
-  SliverList get _reverseList => SliverList(
+  SliverList get _reverseList =>
+      SliverList(
         delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) =>
               _getListItem(context, (index + 1) * -1),
@@ -171,7 +176,8 @@ class _InfiniteListState extends State<InfiniteList> {
         ),
       );
 
-  SliverList get _forwardList => SliverList(
+  SliverList get _forwardList =>
+      SliverList(
         delegate: SliverChildBuilderDelegate(
           _getListItem,
           childCount: widget.maxChildCount,
@@ -207,7 +213,9 @@ class _InfiniteListState extends State<InfiniteList> {
     controller: widget.controller,
     center: widget._centerKey,
     slivers: _slivers,
-    reverse: widget.reverse
+    reverse: widget.reverse,
+    anchor: widget.anchor,
+    cacheExtent: widget.cacheExtent,
   );
 
   @override
@@ -242,20 +250,19 @@ class _StickySliverListItem<I> extends StatefulWidget {
   /// to [AlignmentDirectional] variant
   AlignmentDirectional get alignment {
     switch (listItem.headerAlignment) {
-      case HeaderAlignment.topLeft:
-        return AlignmentDirectional.topStart;
-
-      case HeaderAlignment.topRight:
-        return AlignmentDirectional.topEnd;
-
       case HeaderAlignment.bottomLeft:
         return AlignmentDirectional.bottomStart;
 
       case HeaderAlignment.bottomRight:
         return AlignmentDirectional.bottomEnd;
-    }
 
-    return AlignmentDirectional.topStart;
+      case HeaderAlignment.topRight:
+        return AlignmentDirectional.topEnd;
+
+      case HeaderAlignment.topLeft:
+      default:
+        return AlignmentDirectional.topStart;
+    }
   }
 }
 
@@ -311,15 +318,12 @@ class StickyListItem<I> extends Stack {
   /// Callback function that tells when header to stick to the bottom
   final MinOffsetProvider<I> minOffsetProvider;
 
-  final bool reverse;
-
   StickyListItem({
     @required Widget header,
     @required Widget content,
     @required this.itemIndex,
     this.minOffsetProvider,
     this.streamSink,
-    this.reverse,
     AlignmentDirectional alignment,
     Key key,
   }) : super(
@@ -343,7 +347,6 @@ class StickyListItem<I> extends Stack {
         itemIndex: itemIndex,
         streamSink: streamSink,
         minOffsetProvider: minOffsetProvider,
-        reverse: reverse,
       );
 
   @override
@@ -356,7 +359,6 @@ class StickyListItem<I> extends Stack {
       ..scrollable = _getScrollableState(context)
       ..itemIndex = itemIndex
       ..streamSink = streamSink
-      ..minOffsetProvider = minOffsetProvider
-      ..reverse = reverse;
+      ..minOffsetProvider = minOffsetProvider;
   }
 }

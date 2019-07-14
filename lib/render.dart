@@ -10,7 +10,6 @@ class StickyListItemRenderObject<I> extends RenderStack {
   StreamSink<StickyState<I>> _streamSink;
   I _itemIndex;
   MinOffsetProvider<I> _minOffsetProvider;
-  bool _reverse;
 
   double _lastOffset;
   bool _headerOverflow = false;
@@ -24,12 +23,10 @@ class StickyListItemRenderObject<I> extends RenderStack {
     TextDirection textDirection,
     StackFit fit,
     Overflow overflow,
-    bool reverse = false,
   })  : _scrollable = scrollable,
         _streamSink = streamSink,
         _itemIndex = itemIndex,
         _minOffsetProvider = minOffsetProvider,
-        _reverse = reverse,
         super(
           alignment: alignment,
           textDirection: textDirection,
@@ -75,17 +72,10 @@ class StickyListItemRenderObject<I> extends RenderStack {
     }
   }
 
-  bool get reverse => _reverse;
-
-  set reverse(bool reverse) {
-    _reverse = reverse;
-    markNeedsPaint();
-  }
-
   RenderBox get _headerBox => lastChild;
   RenderBox get _contentBox => firstChild;
 
-  RenderAbstractViewport get _viewport => RenderAbstractViewport.of(this);
+  RenderViewport get _viewport => RenderAbstractViewport.of(this);
 
   @override
   void attach(PipelineOwner owner) {
@@ -117,11 +107,8 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
   void updateHeaderOffset() {
     _headerOverflow = false;
-    final double stuckOffset = _getStuckOffset();
 
-    if (stuckOffset == null) {
-      return;
-    }
+    final double stuckOffset = _stuckOffset;
 
     final StackParentData parentData = _headerBox.parentData;
     final double contentSize = _getContentDirectionSize();
@@ -160,22 +147,17 @@ class StickyListItemRenderObject<I> extends RenderStack {
   }
 
   double get _scrollableSize {
+    final viewportSize = _viewport.size.height;
+
     if (_alignmentStart) {
-      return 0;
+      return -viewportSize * _viewport.anchor;
     }
 
-    return _scrollable.context.size.height;
+    return viewportSize - viewportSize * _viewport.anchor;
   }
 
-  double _getStuckOffset() {
-    final scrollBox = scrollable.context.findRenderObject();
-    if (scrollBox?.attached ?? false) {
-      final revealedOffset = _viewport.getOffsetToReveal(this, 0);
-
-      return revealedOffset.offset - _scrollable.position.pixels - _scrollableSize;
-    }
-
-    return null;
+  double get _stuckOffset {
+      return _viewport.getOffsetToReveal(this, 0).offset - _viewport.offset.pixels - _scrollableSize;
   }
 
   double _getContentDirectionSize() {
@@ -189,21 +171,21 @@ class StickyListItemRenderObject<I> extends RenderStack {
   double _getStateOffset(double stuckOffset, double contentSize) {
     double offset = _getOffset(stuckOffset, 0, contentSize);
 
-    if (!_alignmentStart) {
-      return contentSize - offset;
+    if (_alignmentStart) {
+      return offset;
     }
 
-    return offset;
+    return contentSize - offset;
   }
 
   double _getHeaderOffset(StickyState<I> state, double stuckOffset, double headerSize) {
     final double minOffset = _getMinOffset(state);
 
-    if (!_alignmentStart) {
-      return _getOffset(stuckOffset, minOffset, state.contentSize) - headerSize;
+    if (_alignmentStart) {
+      return _getOffset(stuckOffset, 0, minOffset);
     }
 
-    return _getOffset(stuckOffset, 0, minOffset);
+    return _getOffset(stuckOffset, minOffset, state.contentSize) - headerSize;
   }
 
   double _getOffset(double current, double minPosition, double maxPosition) {
