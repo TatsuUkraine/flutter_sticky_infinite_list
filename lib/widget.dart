@@ -33,12 +33,36 @@ class InfiniteListItem<I> {
   /// By default header positioned until it's offset less than content height
   final MinOffsetProvider<I> minOffsetProvider;
 
+  /// If builder should render header
+  /// during first run
+  ///
+  /// To perform accurate header build, by default
+  /// it renders after first paint is finished, when
+  /// [headerStateBuilder] is defined.
+  ///
+  /// In some cases it can lead to header render delay.
+  ///
+  /// To prevent this you can set [initialHeaderBuild] to `true`.
+  ///
+  /// In that case header will be rendered during initial render
+  /// with basic [StickyState] object.
+  ///
+  /// It will add additional header renderer call.
+  ///
+  /// If this value is `false` - header render callback will be called
+  /// only after it's parent and content will be laid out.
+  ///
+  /// For case when only [headerBuilder] is defined,
+  /// this property will be ignored
+  final bool initialHeaderBuild;
+
   InfiniteListItem({
     @required this.contentBuilder,
     this.headerBuilder,
     this.headerStateBuilder,
     this.minOffsetProvider,
     this.headerAlignment = HeaderAlignment.topLeft,
+    this.initialHeaderBuild = false,
   });
 
   bool get hasStickyHeader =>
@@ -74,7 +98,7 @@ class InfiniteListItem<I> {
   @mustCallSuper
   void dispose() {}
 
-  Widget _getHeader(BuildContext context, Stream<StickyState<I>> stream) {
+  Widget _getHeader(BuildContext context, Stream<StickyState<I>> stream, I index) {
     assert(hasStickyHeader, "At least one builder should be provided");
 
     if (!watchStickyState) {
@@ -84,6 +108,7 @@ class InfiniteListItem<I> {
     return Positioned(
       child: StreamBuilder<StickyState<I>>(
         stream: stream,
+        initialData: initialHeaderBuild ? StickyState<I>(index) : null,
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Container();
@@ -133,6 +158,11 @@ class InfiniteList extends StatefulWidget {
   final int minChildCount;
 
   /// Proxy property for [ScrollView.reverse]
+  ///
+  /// Package doesn't support it yet.
+  ///
+  /// But as temporary solution similar result can be achieved
+  /// with some config combination, described in README.md
   final bool reverse = false;
 
   /// Proxy property for [ScrollView.anchor]
@@ -285,7 +315,7 @@ class _StickySliverListItemState<I> extends State<_StickySliverListItem<I>> {
     return StickyListItem<I>(
       itemIndex: widget.index,
       streamSink: widget.streamController.sink,
-      header: widget.listItem._getHeader(context, widget._stream),
+      header: widget.listItem._getHeader(context, widget._stream, widget.index),
       content: content,
       minOffsetProvider: widget.listItem.minOffsetProvider,
       alignment: widget.alignment,
