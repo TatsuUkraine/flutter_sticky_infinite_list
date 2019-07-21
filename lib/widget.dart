@@ -19,10 +19,9 @@ class InfiniteListItem<I> {
 
   /// Header alignment
   ///
-  /// Currently it supports top left
-  /// and right alignment
-  ///
   /// By default [HeaderAlignment.topLeft]
+  ///
+  /// For more option take a look in [HeaderAlignment]
   final HeaderAlignment headerAlignment;
 
   /// Function, that provides min offset.
@@ -171,6 +170,11 @@ class InfiniteList extends StatefulWidget {
   /// Proxy property for [RenderViewportBase.cacheExtent]
   final double cacheExtent;
 
+  /// Scroll direction
+  ///
+  /// Can be vertical or horizontal
+  final Axis scrollDirection;
+
   final Key _centerKey;
 
   InfiniteList({
@@ -183,6 +187,7 @@ class InfiniteList extends StatefulWidget {
     //this.reverse = false,
     this.anchor = 0.0,
     this.cacheExtent,
+    this.scrollDirection = Axis.vertical,
   })  : _centerKey = (direction == InfiniteListDirection.multi) ? UniqueKey() : null,
         super(key: key);
 
@@ -246,6 +251,7 @@ class _InfiniteListState extends State<InfiniteList> {
     reverse: widget.reverse,
     anchor: widget.anchor,
     cacheExtent: widget.cacheExtent,
+    scrollDirection: widget.scrollDirection,
   );
 
   @override
@@ -280,11 +286,23 @@ class _StickySliverListItem<I> extends StatefulWidget {
   /// to [AlignmentDirectional] variant
   AlignmentDirectional get alignment {
     switch (listItem.headerAlignment) {
+      case HeaderAlignment.centerLeft:
+        return AlignmentDirectional.centerStart;
+
+      case HeaderAlignment.centerRight:
+        return AlignmentDirectional.centerEnd;
+
       case HeaderAlignment.bottomLeft:
         return AlignmentDirectional.bottomStart;
 
+      case HeaderAlignment.bottomCenter:
+        return AlignmentDirectional.bottomCenter;
+
       case HeaderAlignment.bottomRight:
         return AlignmentDirectional.bottomEnd;
+
+      case HeaderAlignment.bottomCenter:
+        return AlignmentDirectional.bottomCenter;
 
       case HeaderAlignment.topRight:
         return AlignmentDirectional.topEnd;
@@ -315,7 +333,11 @@ class _StickySliverListItemState<I> extends State<_StickySliverListItem<I>> {
     return StickyListItem<I>(
       itemIndex: widget.index,
       streamSink: widget.streamController.sink,
-      header: widget.listItem._getHeader(context, widget._stream, widget.index),
+      header: widget.listItem._getHeader(
+        context,
+        widget._stream,
+        widget.index
+      ),
       content: content,
       minOffsetProvider: widget.listItem.minOffsetProvider,
       alignment: widget.alignment,

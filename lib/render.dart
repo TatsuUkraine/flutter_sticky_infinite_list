@@ -131,10 +131,9 @@ class StickyListItemRenderObject<I> extends RenderStack {
       minOffsetProvider(state)
     );
 
-    parentData.offset = Offset(
-      parentData.offset.dx,
+    parentData.offset = _getDirectionalOffset(
+      parentData.offset,
       headerOffset
-        //max(maxOffset, min(-stuckOffset, contentHeight)) - headerHeight
     );
 
     _headerOverflow = _isHeaderOverflow(headerOffset, headerSize, contentSize);
@@ -142,7 +141,6 @@ class StickyListItemRenderObject<I> extends RenderStack {
     if (_lastOffset != offset) {
       _lastOffset = offset;
 
-      //todo: define when header sticky
       streamSink?.add(state.copyWith(
         sticky: _isSticky(
           state,
@@ -157,12 +155,29 @@ class StickyListItemRenderObject<I> extends RenderStack {
     }
   }
 
+  bool get _scrollDirectionVertical =>
+      [AxisDirection.up, AxisDirection.down].contains(_scrollable.axisDirection);
+
   bool get _alignmentStart {
-    return [AlignmentDirectional.topStart, AlignmentDirectional.topEnd].contains(alignment);
+    if (_scrollDirectionVertical) {
+      return [
+        AlignmentDirectional.topStart,
+        AlignmentDirectional.topCenter,
+        AlignmentDirectional.topEnd,
+      ].contains(alignment);
+    }
+
+    return [
+      AlignmentDirectional.topStart,
+      AlignmentDirectional.bottomStart,
+      AlignmentDirectional.centerStart,
+    ].contains(alignment);
   }
 
   double get _scrollableSize {
-    final viewportSize = _viewport.size.height;
+    final viewportSize = _scrollDirectionVertical
+        ? _viewport.size.height
+        : _viewport.size.width;
 
     if (_alignmentStart) {
       return -viewportSize * _viewport.anchor;
@@ -176,11 +191,29 @@ class StickyListItemRenderObject<I> extends RenderStack {
   }
 
   double _getContentDirectionSize() {
-    return _contentBox.size.height;
+    return _scrollDirectionVertical
+        ? _contentBox.size.height
+        : _contentBox.size.width;
   }
 
   double _getHeaderDirectionSize() {
-    return _headerBox.size.height;
+    return _scrollDirectionVertical
+        ? _headerBox.size.height
+        : _headerBox.size.width;
+  }
+
+  Offset _getDirectionalOffset(Offset originalOffset, double offset) {
+    if (_scrollDirectionVertical) {
+      return Offset(
+        originalOffset.dx,
+        offset
+      );
+    }
+
+    return Offset(
+      offset,
+      originalOffset.dy
+    );
   }
 
   double _getStateOffset(double stuckOffset, double contentSize) {

@@ -27,9 +27,13 @@ enum InfiniteListDirection {
 /// hidden size will be calculated against bottom edges
 enum HeaderAlignment {
   topLeft,
+  topCenter,
   topRight,
   bottomLeft,
+  bottomCenter,
   bottomRight,
+  centerLeft,
+  centerRight,
 }
 
 /// Sticky state object
