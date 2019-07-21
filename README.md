@@ -1,6 +1,9 @@
 # Sticky Infinite List
 
 [![pub package](https://img.shields.io/pub/v/sticky_infinite_list.svg)](https://pub.dartlang.org/packages/sticky_infinite_list)
+<a href="https://github.com/Solido/awesome-flutter">
+   <img alt="Awesome Flutter" src="https://img.shields.io/badge/Awesome-Flutter-blue.svg?longCache=true&style=flat-square" />
+</a>
 
 Infinite list with sticky headers.
 
