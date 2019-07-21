@@ -124,12 +124,16 @@ class StickyListItemRenderObject<I> extends RenderStack {
       contentSize: contentSize,
     );
 
-    final double headerOffset = _getHeaderOffset(state, stuckOffset, headerSize);
+    final double headerOffset = _getHeaderOffset(
+      contentSize,
+      stuckOffset,
+      headerSize,
+      minOffsetProvider(state)
+    );
 
-    parentData.offset = Offset(
-      parentData.offset.dx,
+    parentData.offset = _getDirectionalOffset(
+      parentData.offset,
       headerOffset
-        //max(maxOffset, min(-stuckOffset, contentHeight)) - headerHeight
     );
 
     _headerOverflow = _isHeaderOverflow(headerOffset, headerSize, contentSize);
@@ -137,17 +141,43 @@ class StickyListItemRenderObject<I> extends RenderStack {
     if (_lastOffset != offset) {
       _lastOffset = offset;
 
-      //todo: define when header sticky
-      streamSink?.add(state);
+      streamSink?.add(state.copyWith(
+        sticky: _isSticky(
+          state,
+          headerOffset,
+          _getHeaderOffset(
+            contentSize,
+            stuckOffset,
+            headerSize
+          )
+        )
+      ));
     }
   }
 
+  bool get _scrollDirectionVertical =>
+      [AxisDirection.up, AxisDirection.down].contains(_scrollable.axisDirection);
+
   bool get _alignmentStart {
-    return [AlignmentDirectional.topStart, AlignmentDirectional.topEnd].contains(alignment);
+    if (_scrollDirectionVertical) {
+      return [
+        AlignmentDirectional.topStart,
+        AlignmentDirectional.topCenter,
+        AlignmentDirectional.topEnd,
+      ].contains(alignment);
+    }
+
+    return [
+      AlignmentDirectional.topStart,
+      AlignmentDirectional.bottomStart,
+      AlignmentDirectional.centerStart,
+    ].contains(alignment);
   }
 
   double get _scrollableSize {
-    final viewportSize = _viewport.size.height;
+    final viewportSize = _scrollDirectionVertical
+        ? _viewport.size.height
+        : _viewport.size.width;
 
     if (_alignmentStart) {
       return -viewportSize * _viewport.anchor;
@@ -161,11 +191,29 @@ class StickyListItemRenderObject<I> extends RenderStack {
   }
 
   double _getContentDirectionSize() {
-    return _contentBox.size.height;
+    return _scrollDirectionVertical
+        ? _contentBox.size.height
+        : _contentBox.size.width;
   }
 
   double _getHeaderDirectionSize() {
-    return _headerBox.size.height;
+    return _scrollDirectionVertical
+        ? _headerBox.size.height
+        : _headerBox.size.width;
+  }
+
+  Offset _getDirectionalOffset(Offset originalOffset, double offset) {
+    if (_scrollDirectionVertical) {
+      return Offset(
+        originalOffset.dx,
+        offset
+      );
+    }
+
+    return Offset(
+      offset,
+      originalOffset.dy
+    );
   }
 
   double _getStateOffset(double stuckOffset, double contentSize) {
@@ -178,25 +226,28 @@ class StickyListItemRenderObject<I> extends RenderStack {
     return contentSize - offset;
   }
 
-  double _getHeaderOffset(StickyState<I> state, double stuckOffset, double headerSize) {
-    final double minOffset = _getMinOffset(state);
+  double _getHeaderOffset(
+    double contentSize,
+    double stuckOffset,
+    double headerSize,
+    [double providedMinOffset = 0]
+  ) {
+    final double minOffset = _getMinOffset(contentSize, providedMinOffset);
 
     if (_alignmentStart) {
       return _getOffset(stuckOffset, 0, minOffset);
     }
 
-    return _getOffset(stuckOffset, minOffset, state.contentSize) - headerSize;
+    return _getOffset(stuckOffset, minOffset, contentSize) - headerSize;
   }
 
   double _getOffset(double current, double minPosition, double maxPosition) {
     return max(minPosition, min(-current, maxPosition));
   }
 
-  double _getMinOffset(StickyState<I> state) {
-    double minOffset = minOffsetProvider(state);
-
+  double _getMinOffset(double contentSize, double minOffset) {
     if (_alignmentStart) {
-      return state.contentSize - minOffset;
+      return contentSize - minOffset;
     }
 
     return minOffset;
@@ -204,5 +255,17 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
   bool _isHeaderOverflow(double headerOffset, double headerSize, double contentSize) {
     return headerOffset < 0 || headerOffset + headerSize > contentSize;
+  }
+
+  bool _isSticky(
+    StickyState<I> state,
+    double actualHeaderOffset,
+    double headerOffset
+  ) {
+    return (
+      actualHeaderOffset == headerOffset &&
+      state.position > 0 &&
+      state.position < 1
+    );
   }
 }
