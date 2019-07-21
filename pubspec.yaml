@@ -1,11 +1,11 @@
 name: sticky_infinite_list
 description: >-
   Infinite list with sticky headers that can be rendered in both directions
-  or in reverse direction.
+  or in reverse direction. Supports horizontal scroll.
 
   Can be customized or with config options or with override.
 
-version: 1.1.0
+version: 1.2.0
 author: TatsuUkraine <tatsu.ukraine@gmail.com>
 homepage: https://github.com/TatsuUkraine/flutter_sticky_infinite_list
 repository: https://github.com/TatsuUkraine/flutter_sticky_infinite_list

@@ -1,3 +1,13 @@
+## [1.2.0] - 2019-06-21
+
+**Bug fixes**
+- fixed `sticky` state value definition
+
+**Features**
+- added support for new header position values
+- added support for horizontal scroll
+- added [Flutter Awesome](https://github.com/Solido/awesome-flutter) badge 
+
 ## [1.1.0] - 2019-06-15
 
 - Added bottom left and right positions support for headers
