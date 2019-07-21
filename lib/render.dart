@@ -124,7 +124,12 @@ class StickyListItemRenderObject<I> extends RenderStack {
       contentSize: contentSize,
     );
 
-    final double headerOffset = _getHeaderOffset(state, stuckOffset, headerSize);
+    final double headerOffset = _getHeaderOffset(
+      contentSize,
+      stuckOffset,
+      headerSize,
+      minOffsetProvider(state)
+    );
 
     parentData.offset = Offset(
       parentData.offset.dx,
@@ -138,7 +143,17 @@ class StickyListItemRenderObject<I> extends RenderStack {
       _lastOffset = offset;
 
       //todo: define when header sticky
-      streamSink?.add(state);
+      streamSink?.add(state.copyWith(
+        sticky: _isSticky(
+          state,
+          headerOffset,
+          _getHeaderOffset(
+            contentSize,
+            stuckOffset,
+            headerSize
+          )
+        )
+      ));
     }
   }
 
@@ -178,25 +193,28 @@ class StickyListItemRenderObject<I> extends RenderStack {
     return contentSize - offset;
   }
 
-  double _getHeaderOffset(StickyState<I> state, double stuckOffset, double headerSize) {
-    final double minOffset = _getMinOffset(state);
+  double _getHeaderOffset(
+    double contentSize,
+    double stuckOffset,
+    double headerSize,
+    [double providedMinOffset = 0]
+  ) {
+    final double minOffset = _getMinOffset(contentSize, providedMinOffset);
 
     if (_alignmentStart) {
       return _getOffset(stuckOffset, 0, minOffset);
     }
 
-    return _getOffset(stuckOffset, minOffset, state.contentSize) - headerSize;
+    return _getOffset(stuckOffset, minOffset, contentSize) - headerSize;
   }
 
   double _getOffset(double current, double minPosition, double maxPosition) {
     return max(minPosition, min(-current, maxPosition));
   }
 
-  double _getMinOffset(StickyState<I> state) {
-    double minOffset = minOffsetProvider(state);
-
+  double _getMinOffset(double contentSize, double minOffset) {
     if (_alignmentStart) {
-      return state.contentSize - minOffset;
+      return contentSize - minOffset;
     }
 
     return minOffset;
@@ -204,5 +222,17 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
   bool _isHeaderOverflow(double headerOffset, double headerSize, double contentSize) {
     return headerOffset < 0 || headerOffset + headerSize > contentSize;
+  }
+
+  bool _isSticky(
+    StickyState<I> state,
+    double actualHeaderOffset,
+    double headerOffset
+  ) {
+    return (
+      actualHeaderOffset == headerOffset &&
+      state.position > 0 &&
+      state.position < 1
+    );
   }
 }
