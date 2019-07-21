@@ -246,7 +246,7 @@ InfiniteListItem(
 
 #### Horizontal scroll demo
 
-<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/blob/bdd86fd0bbe8183fc4adda631b8dea353b7afa98/doc/images/header_position.gif?raw=true" width="50%" />
+<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/blob/bdd86fd0bbe8183fc4adda631b8dea353b7afa98/doc/images/horizontal_scroll.gif?raw=true" width="50%" />
 
 ### Reverse infinite scroll
 
