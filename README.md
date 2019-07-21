@@ -20,6 +20,15 @@ Scrollable widgets independently from `InfiniteList` container.
 This package uses `CustomScrollView` to perform scroll with all
 benefits for performance that Flutter provides.
 
+## Features
+
+- sticky headers within infinite list
+- multi directional infinite list
+- customization for sticky header position
+- horizontal sticky list support
+- dynamic header build on content scroll
+- dynamic min offset calculation on content scroll
+
 ## Demo
 
 <img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/blob/bdd86fd0bbe8183fc4adda631b8dea353b7afa98/doc/images/base_scroll.gif?raw=true" width="50%" />
