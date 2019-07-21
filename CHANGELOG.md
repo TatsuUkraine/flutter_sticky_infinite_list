@@ -1,3 +1,7 @@
+## [1.2.1] - 2019-06-21
+
+- shorten package description
+
 ## [1.2.0] - 2019-06-21
 
 **Bug fixes**
