@@ -172,7 +172,10 @@ class InfiniteList extends StatefulWidget {
 
   /// Scroll direction
   ///
-  /// Can be vertical or horizontal
+  /// Can be vertical or horizontal (see [Axis] class)
+  ///
+  /// This value also affects how bottom or top
+  /// edge header positioned headers behave
   final Axis scrollDirection;
 
   final Key _centerKey;

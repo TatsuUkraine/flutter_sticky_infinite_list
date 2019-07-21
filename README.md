@@ -8,6 +8,9 @@ This package was made in order to make possible
 render infinite list in both directions with sticky headers, unlike most
 packages in Dart Pub.
 
+Supports various header positioning. Also supports Vertical and
+Horizontal scroll list
+
 It highly customizable and doesn't have any third party dependencies or native(Android/iOS) code.
 
 In addition to default usage, this package exposes some classes, that
@@ -19,7 +22,7 @@ benefits for performance that Flutter provides.
 
 ## Demo
 
-<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/blob/master/doc/images/example.gif?raw=true" width="50%" />
+<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/blob/bdd86fd0bbe8183fc4adda631b8dea353b7afa98/doc/images/base_scroll.gif?raw=true" width="50%" />
 
 ## Getting Started
 
@@ -70,6 +73,59 @@ class Example extends StatelessWidget {
       }
     );
   }
+}
+```
+
+### State
+
+When min offset callback invoked or header builder is invoked
+object `StickyState` is passed as parameter
+
+This object describes current state for sticky header.
+
+```dart
+class StickyState<I> {
+  /// Position, that header already passed
+  ///
+  /// Value can be between 0.0 and 1.0
+  ///
+  /// If it's `0.0` - sticky in max start position
+  ///
+  /// `1.0` - max end position
+  ///
+  /// If [InfiniteListItem.initialHeaderBuild] is true, initial
+  /// header render will be with position = 0
+  final double position;
+
+  /// Number of pixels, that outside of viewport
+  ///
+  /// If [InfiniteListItem.initialHeaderBuild] is true, initial
+  /// header render will be with offset = 0
+  /// 
+  /// For header bottom positions (or right positions for horizontal)
+  /// offset value also will be amount of pixels that was scrolled away
+  final double offset;
+
+  /// Item index
+  final I index;
+
+  /// If header is in sticky state
+  ///
+  /// If [InfiniteListItem.minOffsetProvider] is defined,
+  /// it could be that header builder will be emitted with new state
+  /// on scroll, but [sticky] will be false, if offset already passed
+  /// min offset value
+  ///
+  /// WHen [InfiniteListItem.minOffsetProvider] is called, [sticky]
+  /// will always be `false`. Since for min offset calculation
+  /// offset itself not defined yet
+  final bool sticky;
+
+  /// Scroll item height.
+  ///
+  /// If [InfiniteListItem.initialHeaderBuild] is true, initial
+  /// header render will be called without this value
+  final double contentSize;
 }
 ```
 
@@ -166,13 +222,31 @@ InfiniteListItem(
   
   /// Header alignment
   /// 
-  /// Use [HeaderAlignment] to align header to left
-  /// or right side
+  /// Use [HeaderAlignment] to align header to left,
+  /// right, top or bottom side
   /// 
   /// Optional. Default value [HeaderAlignment.topLeft]
   headerAlignment: HeaderAlignment.topLeft,
+  
+  /// Scroll direction
+  ///
+  /// Can be vertical or horizontal (see [Axis] class)
+  ///
+  /// This value also affects how bottom or top
+  /// edge header positioned headers behave
+  scrollDirection: Axis.vertical,
 );
 ```
+
+### Demos
+
+#### Header alignment demo
+
+<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/blob/bdd86fd0bbe8183fc4adda631b8dea353b7afa98/doc/images/header_position.gif?raw=true" width="50%" />
+
+#### Horizontal scroll demo
+
+<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/blob/bdd86fd0bbe8183fc4adda631b8dea353b7afa98/doc/images/header_position.gif?raw=true" width="50%" />
 
 ### Reverse infinite scroll
 
@@ -225,7 +299,7 @@ class Example extends StatelessWidget {
 
 #### Demo
 
-<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/blob/master/doc/images/reverse.gif?raw=true" width="50%" />
+<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/blob/41fe9c321842cbfc24df509ddd142c5756a9162f/doc/images/reverse_scroll.gif?raw=true" width="50%" />
 
 For more info take a look at
 [Example](https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example) project

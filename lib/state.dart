@@ -17,11 +17,17 @@ enum InfiniteListDirection {
 
 /// Alignment options
 ///
-/// For [HeaderAlignment.bottomLeft] and [HeaderAlignment.bottomRight]
-/// header will be positioned against content bottom edge
+/// [HeaderAlignment.bottomLeft], [HeaderAlignment.bottomRight] and
+/// [HeaderAlignment.bottomCenter] header will be positioned
+/// against content bottom edge for vertical scroll
+///
+/// [HeaderAlignment.topRight], [HeaderAlignment.bottomRight] and
+/// [HeaderAlignment.canterRight] header will be positioned
+/// against content right edge for horizontal scroll
 ///
 /// Which also means that headers will become sticky, when content
-/// bottom edge will go outside of ViewPort bottom edge
+/// bottom edge (or right edge for horizontal) will
+/// go outside of ViewPort bottom (right for horizontal) edge
 ///
 /// It also affects on [StickyState.offset] value, since in that case
 /// hidden size will be calculated against bottom edges
@@ -55,6 +61,9 @@ class StickyState<I> {
   ///
   /// If [InfiniteListItem.initialHeaderBuild] is true, initial
   /// header render will be with offset = 0
+  ///
+  /// For header bottom positions (or right positions for horizontal)
+  /// offset value also will be amount of pixels that was scrolled away
   final double offset;
 
   /// Item index
@@ -66,6 +75,10 @@ class StickyState<I> {
   /// it could be that header builder will be emitted with new state
   /// on scroll, but [sticky] will be false, if offset already passed
   /// min offset value
+  ///
+  /// WHen [InfiniteListItem.minOffsetProvider] is called, [sticky]
+  /// will always be `false`. Since for min offset calculation
+  /// offset itself not defined yet
   final bool sticky;
 
   /// Scroll item height.
