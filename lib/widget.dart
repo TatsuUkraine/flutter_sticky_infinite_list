@@ -406,14 +406,15 @@ class StickyListItem<I> extends Stack {
 
   @override
   @mustCallSuper
-  void updateRenderObject(
-      BuildContext context, StickyListItemRenderObject<I> renderObject) {
+  void updateRenderObject(BuildContext context, RenderStack renderObject) {
     super.updateRenderObject(context, renderObject);
 
-    renderObject
-      ..scrollable = _getScrollableState(context)
-      ..itemIndex = itemIndex
-      ..streamSink = streamSink
-      ..minOffsetProvider = minOffsetProvider;
+    if (renderObject is StickyListItemRenderObject<I>) {
+      renderObject
+        ..scrollable = _getScrollableState(context)
+        ..itemIndex = itemIndex
+        ..streamSink = streamSink
+        ..minOffsetProvider = minOffsetProvider;
+    }
   }
 }
