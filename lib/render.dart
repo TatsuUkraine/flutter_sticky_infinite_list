@@ -156,7 +156,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
   }
 
   bool get _scrollDirectionVertical =>
-      [AxisDirection.up, AxisDirection.down].contains(_scrollable.axisDirection);
+      [AxisDirection.up, AxisDirection.down].contains(scrollable.axisDirection);
 
   bool get _alignmentStart {
     if (_scrollDirectionVertical) {
