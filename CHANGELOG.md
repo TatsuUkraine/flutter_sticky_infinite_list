@@ -1,3 +1,9 @@
+## [1.2.2] - 2019-06-22
+
+**Bug fixes**
+
+- fixed type definition for render object [#10](https://github.com/TatsuUkraine/flutter_sticky_infinite_list/issues/10)
+
 ## [1.2.1] - 2019-06-21
 
 - shorten package description
