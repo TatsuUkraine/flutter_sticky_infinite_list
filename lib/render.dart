@@ -67,8 +67,8 @@ class StickyListItemRenderObject<I> extends RenderStack {
     markNeedsPaint();
 
     if (attached) {
-      oldScrollable.widget.controller.removeListener(markNeedsPaint);
-      newScrollable.widget.controller.addListener(markNeedsPaint);
+      oldScrollable.position.removeListener(markNeedsPaint);
+      newScrollable.position.addListener(markNeedsPaint);
     }
   }
 
@@ -80,12 +80,12 @@ class StickyListItemRenderObject<I> extends RenderStack {
   @override
   void attach(PipelineOwner owner) {
     super.attach(owner);
-    scrollable.widget.controller.addListener(markNeedsPaint);
+    scrollable.position.addListener(markNeedsPaint);
   }
 
   @override
   void detach() {
-    scrollable.widget.controller.removeListener(markNeedsPaint);
+    scrollable.position.removeListener(markNeedsPaint);
     super.detach();
   }
 
