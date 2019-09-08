@@ -330,8 +330,7 @@ Luckily you can extend and override base `InfiniteListItem` class
 class SomeCustomListItem extends InfiniteListItem<I> {
   /// Header alignment
   /// 
-  /// Currently it supports top left
-  /// and right alignment
+  /// Supports all sides alignment, see [HeaderAlignment] for more info
   /// 
   /// By default [HeaderAlignment.topLeft]
   final HeaderAlignment headerAlignment;
@@ -389,7 +388,7 @@ class SomeCustomListItem extends InfiniteListItem<I> {
 }
 ```
 
-#### Need more override?.. Ok (not tested)
+#### Need more override?..
 
 **If you get any problems with this type of override,
  please create an issue**
@@ -403,6 +402,55 @@ Also it requires to be rendered inside `Scrollable` widget and `Viewport`,
 since it subscribes to scroll event and calculates position
 against `Viewport` coordinates (see `StickyListItemRenderObject` class
 for more information)
+
+For example 
+
+```dart
+Widget build(BuildContext context) {
+  return SingleChildScrollView(
+    child: Column(
+      children: <Widget>[
+        Container(
+          height: height,
+          color: Colors.lightBlueAccent,
+          child: Placeholder(),
+        ),
+        StickyListItem<String>(
+          header: Container(
+            height: 30,
+            width: double.infinity,
+            color: Colors.orange,
+            child: Center(
+              child: Text('Sticky Header')
+            ),
+          ),
+          content: Container(
+            height: height,
+            color: Colors.blueAccent,
+            child: Placeholder(),
+          ),
+          itemIndex: 'single-child-index',
+        ),
+        Container(
+          height: height,
+          color: Colors.cyan,
+          child: Placeholder(),
+        ),
+      ],
+    ),
+  );
+}
+```
+
+This code will render single child scroll
+with 3 widgets. Middle one - item with sticky header.
+
+**Demo**
+
+<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/blob/5dabe8503ad2d578f9b07018d2d1c76a61a258ef/doc/images/single-scroll.gif?raw=true" width="50%" />
+
+For more complex example please take a look at "Single Example" page
+in [Example project](https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example)
 
 ## Changelog
 
