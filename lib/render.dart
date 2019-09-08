@@ -175,10 +175,13 @@ class StickyListItemRenderObject<I> extends RenderStack {
   }
 
   double get _scrollableSize {
+    final viewportContainer = _viewport;
+
     double viewportSize;
 
-    if (_viewport is RenderBox) {
-      final viewportBox = _viewport as RenderBox;
+    if (viewportContainer is RenderBox) {
+      final RenderBox viewportBox = viewportContainer as RenderBox;
+
       viewportSize = _scrollDirectionVertical
           ? viewportBox.size.height
           : viewportBox.size.width;
@@ -187,8 +190,9 @@ class StickyListItemRenderObject<I> extends RenderStack {
     assert(viewportSize != null, 'Can\'t define view port size');
 
     double anchor = 0;
-    if (_viewport is RenderViewport) {
-      anchor = (_viewport as RenderViewport).anchor;
+
+    if (viewportContainer is RenderViewport) {
+      anchor = viewportContainer.anchor;
     }
 
     if (_alignmentStart) {
