@@ -469,4 +469,5 @@ Currently this package can't work with reverse scroll. For some reason
 flutter calculates coordinate for negative list items in a
 different way in reverse mode, comparing to regular scroll direction.
 
-But there is an workaround can be used, described in [Reverse infinite scroll]
+But there is an workaround can be used, described
+in [Reverse infinite scroll](#reverse-infinite-scroll)
