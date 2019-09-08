@@ -384,7 +384,7 @@ class StickyListItem<I> extends Stack {
   }) : super(
           key: key,
           children: [content, header],
-          alignment: alignment,
+          alignment: alignment ?? AlignmentDirectional.topStart,
           overflow: Overflow.clip,
         );
 
