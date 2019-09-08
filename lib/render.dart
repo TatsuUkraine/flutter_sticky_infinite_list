@@ -67,25 +67,25 @@ class StickyListItemRenderObject<I> extends RenderStack {
     markNeedsPaint();
 
     if (attached) {
-      oldScrollable.widget.controller.removeListener(markNeedsPaint);
-      newScrollable.widget.controller.addListener(markNeedsPaint);
+      oldScrollable.position.removeListener(markNeedsPaint);
+      newScrollable.position.addListener(markNeedsPaint);
     }
   }
 
   RenderBox get _headerBox => lastChild;
   RenderBox get _contentBox => firstChild;
 
-  RenderViewport get _viewport => RenderAbstractViewport.of(this);
+  RenderAbstractViewport get _viewport => RenderAbstractViewport.of(this);
 
   @override
   void attach(PipelineOwner owner) {
     super.attach(owner);
-    scrollable.widget.controller.addListener(markNeedsPaint);
+    scrollable.position.addListener(markNeedsPaint);
   }
 
   @override
   void detach() {
-    scrollable.widget.controller.removeListener(markNeedsPaint);
+    scrollable.position.removeListener(markNeedsPaint);
     super.detach();
   }
 
@@ -175,19 +175,35 @@ class StickyListItemRenderObject<I> extends RenderStack {
   }
 
   double get _scrollableSize {
-    final viewportSize = _scrollDirectionVertical
-        ? _viewport.size.height
-        : _viewport.size.width;
+    final viewportContainer = _viewport;
 
-    if (_alignmentStart) {
-      return -viewportSize * _viewport.anchor;
+    double viewportSize;
+
+    if (viewportContainer is RenderBox) {
+      final RenderBox viewportBox = viewportContainer as RenderBox;
+
+      viewportSize = _scrollDirectionVertical
+          ? viewportBox.size.height
+          : viewportBox.size.width;
     }
 
-    return viewportSize - viewportSize * _viewport.anchor;
+    assert(viewportSize != null, 'Can\'t define view port size');
+
+    double anchor = 0;
+
+    if (viewportContainer is RenderViewport) {
+      anchor = viewportContainer.anchor;
+    }
+
+    if (_alignmentStart) {
+      return -viewportSize * anchor;
+    }
+
+    return viewportSize - viewportSize * anchor;
   }
 
   double get _stuckOffset {
-      return _viewport.getOffsetToReveal(this, 0).offset - _viewport.offset.pixels - _scrollableSize;
+      return _viewport.getOffsetToReveal(this, 0).offset - _scrollable.position.pixels - _scrollableSize;
   }
 
   double _getContentDirectionSize() {
