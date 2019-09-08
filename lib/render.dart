@@ -75,7 +75,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
   RenderBox get _headerBox => lastChild;
   RenderBox get _contentBox => firstChild;
 
-  RenderViewport get _viewport => RenderAbstractViewport.of(this);
+  RenderAbstractViewport get _viewport => RenderAbstractViewport.of(this);
 
   @override
   void attach(PipelineOwner owner) {
@@ -175,19 +175,31 @@ class StickyListItemRenderObject<I> extends RenderStack {
   }
 
   double get _scrollableSize {
-    final viewportSize = _scrollDirectionVertical
-        ? _viewport.size.height
-        : _viewport.size.width;
+    double viewportSize;
 
-    if (_alignmentStart) {
-      return -viewportSize * _viewport.anchor;
+    if (_viewport is RenderBox) {
+      final viewportBox = _viewport as RenderBox;
+      viewportSize = _scrollDirectionVertical
+          ? viewportBox.size.height
+          : viewportBox.size.width;
     }
 
-    return viewportSize - viewportSize * _viewport.anchor;
+    assert(viewportSize != null, 'Can\'t define view port size');
+
+    double anchor = 0;
+    if (_viewport is RenderViewport) {
+      anchor = (_viewport as RenderViewport).anchor;
+    }
+
+    if (_alignmentStart) {
+      return -viewportSize * anchor;
+    }
+
+    return viewportSize - viewportSize * anchor;
   }
 
   double get _stuckOffset {
-      return _viewport.getOffsetToReveal(this, 0).offset - _viewport.offset.pixels - _scrollableSize;
+      return _viewport.getOffsetToReveal(this, 0).offset - _scrollable.position.pixels - _scrollableSize;
   }
 
   double _getContentDirectionSize() {
