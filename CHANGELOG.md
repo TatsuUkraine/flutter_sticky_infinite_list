@@ -1,3 +1,14 @@
+## [1.2.3] - 2019-09-08
+
+**Bug fixes**
+
+- fixed horizontal scroll usage without controller
+ [#13](https://github.com/TatsuUkraine/flutter_sticky_infinite_list/issues/13)
+- fixed `SingleChildScrollView` viewport usage
+
+**Updates**
+- added examples to `README.md`
+
 ## [1.2.2] - 2019-06-22
 
 **Bug fixes**
