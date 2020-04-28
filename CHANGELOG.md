@@ -1,3 +1,8 @@
+## [1.3.0] - 2020-04-28
+
+**Features**
+- Added physics proxy property to `InfiniteList`
+
 ## [1.2.3] - 2019-09-08
 
 **Bug fixes**
