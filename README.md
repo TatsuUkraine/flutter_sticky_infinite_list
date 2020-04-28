@@ -181,6 +181,9 @@ InfiniteList(
   
   /// ScrollView anchor value.
   anchor: 0.0,
+  
+  /// ScrollView physics value.
+  physics: null,
 
   /// Item builder
   /// 
