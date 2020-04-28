@@ -178,6 +178,9 @@ class InfiniteList extends StatefulWidget {
   /// edge header positioned headers behave
   final Axis scrollDirection;
 
+  /// Proxy property for [ScrollView.physics]
+  final ScrollPhysics physics;
+
   final Key _centerKey;
 
   InfiniteList({
@@ -191,6 +194,7 @@ class InfiniteList extends StatefulWidget {
     this.anchor = 0.0,
     this.cacheExtent,
     this.scrollDirection = Axis.vertical,
+    this.physics,
   })  : _centerKey = (direction == InfiniteListDirection.multi) ? UniqueKey() : null,
         super(key: key);
 
@@ -255,6 +259,7 @@ class _InfiniteListState extends State<InfiniteList> {
     anchor: widget.anchor,
     cacheExtent: widget.cacheExtent,
     scrollDirection: widget.scrollDirection,
+    physics: widget.physics,
   );
 
   @override
