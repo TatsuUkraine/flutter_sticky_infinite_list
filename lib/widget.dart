@@ -71,6 +71,9 @@ class InfiniteListItem<I> {
   /// See [HeaderPositionAxis] for more info
   final HeaderPositionAxis positionAxis;
 
+  /// List item padding, see [EdgeInsets] for more info
+  final EdgeInsets padding;
+
   final bool _overlayContent;
 
   const InfiniteListItem({
@@ -81,6 +84,7 @@ class InfiniteListItem<I> {
     this.mainAxisAlignment = HeaderMainAxisAlignment.start,
     this.crossAxisAlignment = HeaderCrossAxisAlignment.start,
     this.positionAxis = HeaderPositionAxis.mainAxis,
+    this.padding,
   }): _overlayContent = false,
       initialHeaderBuild = true;
 
@@ -92,6 +96,7 @@ class InfiniteListItem<I> {
     this.initialHeaderBuild = false,
     this.mainAxisAlignment = HeaderMainAxisAlignment.start,
     this.crossAxisAlignment = HeaderCrossAxisAlignment.start,
+    this.padding,
   })
       : positionAxis = HeaderPositionAxis.mainAxis,
         _overlayContent = true;
@@ -136,18 +141,16 @@ class InfiniteListItem<I> {
       return buildHeader(context);
     }
 
-    return Positioned(
-      child: StreamBuilder<StickyState<I>>(
-        stream: stream,
-        initialData: initialHeaderBuild ? StickyState<I>(index) : null,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Container();
-          }
+    return StreamBuilder<StickyState<I>>(
+      stream: stream,
+      initialData: initialHeaderBuild ? StickyState<I>(index) : null,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Container();
+        }
 
-          return buildHeader(context, snapshot.data);
-        },
-      ),
+        return buildHeader(context, snapshot.data);
+      },
     );
   }
 }
@@ -331,7 +334,26 @@ class _StickySliverListItemState<I> extends State<_StickySliverListItem<I>> {
   }
 
   @override
+
   Widget build(BuildContext context) {
+    if (widget.listItem.padding == null) {
+      return _buildItem(context);
+    }
+
+    return Padding(
+      padding: widget.listItem.padding,
+      child: _buildItem(context),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    widget.listItem.dispose();
+  }
+
+  Widget _buildItem(BuildContext context) {
     final Widget content = widget.listItem.buildContent(context);
 
     if (!widget.listItem.hasStickyHeader) {
@@ -368,13 +390,6 @@ class _StickySliverListItemState<I> extends State<_StickySliverListItem<I>> {
       crossAxisAlignment: widget.listItem.crossAxisAlignment,
       positionAxis: widget.listItem.positionAxis,
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-
-    widget.listItem.dispose();
   }
 }
 

@@ -156,6 +156,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
     header.layout(containerConstraints, parentUsesSize: true);
 
     final StackParentData contentParentData = content.parentData as StackParentData;
+
     contentParentData.offset = Offset.zero;
 
     double width = constraints.minWidth;
