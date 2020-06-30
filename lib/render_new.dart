@@ -8,13 +8,14 @@ import 'models/alignments.dart';
 import 'models/sticky_state.dart';
 import 'models/types.dart';
 
+///todo: rename file, remove old render object
 class StickyListItemRenderObject<I> extends RenderStack {
   ScrollableState _scrollable;
   StreamSink<StickyState<I>> _streamSink;
   I _itemIndex;
   MinOffsetProvider<I> _minOffsetProvider;
   bool _overlayContent;
-  HeaderPositionAxis _headerPositionAxis;
+  HeaderPositionAxis _positionAxis;
   HeaderMainAxisAlignment _mainAxisAlignment;
   HeaderCrossAxisAlignment _crossAxisAlignment;
 
@@ -29,15 +30,15 @@ class StickyListItemRenderObject<I> extends RenderStack {
     TextDirection textDirection,
     Overflow overflow,
     bool overlayContent,
-    HeaderPositionAxis headerPositionAxis,
-    HeaderMainAxisAlignment mainAxisAlignment,
-    HeaderCrossAxisAlignment crossAxisAlignment,
+    HeaderPositionAxis positionAxis = HeaderPositionAxis.mainAxis,
+    HeaderMainAxisAlignment mainAxisAlignment = HeaderMainAxisAlignment.start,
+    HeaderCrossAxisAlignment crossAxisAlignment = HeaderCrossAxisAlignment.start,
   })  : _scrollable = scrollable,
         _streamSink = streamSink,
         _itemIndex = itemIndex,
         _minOffsetProvider = minOffsetProvider,
         _overlayContent = overlayContent,
-        _headerPositionAxis = headerPositionAxis,
+        _positionAxis = positionAxis,
         _mainAxisAlignment = mainAxisAlignment,
         _crossAxisAlignment = crossAxisAlignment,
         super(
@@ -71,12 +72,18 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
   set overlayContent(bool overlayContent) {
     _overlayContent = overlayContent;
-    markNeedsPaint();
+
+    if (_overlayContent != overlayContent) {
+      markNeedsLayout();
+    }
   }
 
-  set headerPositionAxis(HeaderPositionAxis headerPositionAxis) {
-    _headerPositionAxis = headerPositionAxis;
-    markNeedsPaint();
+  set positionAxis(HeaderPositionAxis positionAxis) {
+    _positionAxis = positionAxis;
+
+    if (_positionAxis != positionAxis) {
+      markNeedsLayout();
+    }
   }
 
   set mainAxisAlignment(HeaderMainAxisAlignment axisAlignment) {
@@ -144,61 +151,94 @@ class StickyListItemRenderObject<I> extends RenderStack {
     final RenderBox content = _contentBox;
     final RenderBox header = _headerBox;
 
-    content.layout(constraints.loosen(), parentUsesSize: true);
+    final BoxConstraints containerConstraints = constraints.loosen();
 
-    final Size childSize = content.size;
-
-    double width = max(constraints.minWidth, childSize.width);
-    double height = max(constraints.minHeight, childSize.height);
+    header.layout(containerConstraints, parentUsesSize: true);
 
     final StackParentData contentParentData = content.parentData as StackParentData;
+    contentParentData.offset = Offset.zero;
 
+    double width = constraints.minWidth;
+    double height = constraints.minHeight;
+
+    /// todo: rewrite this block
     if (!_overlayContent) {
       final Size headerSize = header.size;
-      double headerHeight = max(constraints.minHeight, headerSize.height);
-      double headerWidth = max(constraints.minWidth, headerSize.width);
 
-      switch (_headerPositionAxis) {
+      switch (_positionAxis) {
         case HeaderPositionAxis.mainAxis:
           if (_scrollDirectionVertical) {
-            height += headerHeight;
-
             if (_mainAxisAlignment == HeaderMainAxisAlignment.start) {
-              contentParentData.offset = Offset(0, headerHeight);
+              contentParentData.offset = Offset(0, headerSize.height);
             }
+
+            content.layout(containerConstraints.copyWith(
+              maxHeight: containerConstraints.maxHeight - headerSize.height
+            ), parentUsesSize: true);
+
+            Size contentSize = content.size;
+
+            width = contentSize.width;
+            height = contentSize.height + headerSize.height;
 
             break;
           }
 
-          width += headerWidth;
-
           if (_mainAxisAlignment == HeaderMainAxisAlignment.start) {
-            contentParentData.offset = Offset(headerWidth, 0);
+            contentParentData.offset = Offset(headerSize.width, 0);
           }
+
+          content.layout(containerConstraints.copyWith(
+            maxWidth: containerConstraints.maxWidth - headerSize.width
+          ), parentUsesSize: true);
+
+          Size contentSize = content.size;
+
+          width = contentSize.width + headerSize.width;
+          height = contentSize.height;
 
           break;
 
         case HeaderPositionAxis.crossAxis:
           if (_scrollDirectionVertical) {
-            width += headerWidth;
-
             if (_crossAxisAlignment == HeaderCrossAxisAlignment.start) {
-              contentParentData.offset = Offset(headerWidth, 0);
+              contentParentData.offset = Offset(headerSize.width, 0);
             }
+
+            content.layout(containerConstraints.copyWith(
+              maxWidth: containerConstraints.maxWidth - headerSize.width
+            ), parentUsesSize: true);
+
+            Size contentSize = content.size;
+
+            width = contentSize.width + headerSize.width;
+            height = contentSize.height;
 
             break;
           }
 
-          height += headerHeight;
-
           if (_crossAxisAlignment == HeaderCrossAxisAlignment.start) {
-            contentParentData.offset = Offset(0, headerHeight);
+            contentParentData.offset = Offset(0, headerSize.height);
           }
+
+          content.layout(containerConstraints.copyWith(
+            maxHeight: containerConstraints.maxHeight - headerSize.height
+          ), parentUsesSize: true);
+
+          Size contentSize = content.size;
+
+          width = contentSize.width;
+          height = contentSize.height + headerSize.height;
 
           break;
       }
     } else {
-      contentParentData.offset = Offset.zero;
+      content.layout(containerConstraints, parentUsesSize: true);
+
+      Size contentSize = content.size;
+
+      width = contentSize.width;
+      height = contentSize.height;
     }
 
     size = Size(width, height);
@@ -207,9 +247,11 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
     assert(size.isFinite);
 
-    final StackParentData headerParentData = _headerBox.parentData as StackParentData;
+    final StackParentData headerParentData = header.parentData as StackParentData;
 
-    RenderStack.layoutPositionedChild(_headerBox, headerParentData, size, alignment);
+    headerParentData.offset = alignment.resolve(textDirection).alongOffset(size - header.size as Offset);
+
+    //RenderStack.layoutPositionedChild(header, headerParentData, size, alignment);
   }
 
   void updateHeaderOffset() {
@@ -262,6 +304,58 @@ class StickyListItemRenderObject<I> extends RenderStack {
     }
   }
 
+  @override
+  double computeMinIntrinsicWidth(double height) {
+    if (
+      _overlayContent ||
+      _scrollDirectionVertical && _positionAxis == HeaderPositionAxis.mainAxis ||
+      !_scrollDirectionVertical && _positionAxis == HeaderPositionAxis.crossAxis
+    ) {
+      return _contentBox.getMinIntrinsicWidth(height);
+    }
+
+    return _contentBox.getMinIntrinsicWidth(height) + _headerBox.getMinIntrinsicWidth(height);
+  }
+
+  @override
+  double computeMaxIntrinsicWidth(double height) {
+    if (
+      _overlayContent ||
+      _scrollDirectionVertical && _positionAxis == HeaderPositionAxis.mainAxis ||
+      !_scrollDirectionVertical && _positionAxis == HeaderPositionAxis.crossAxis
+    ) {
+      return _contentBox.getMaxIntrinsicWidth(height);
+    }
+
+    return _contentBox.getMaxIntrinsicWidth(height) + _headerBox.getMaxIntrinsicWidth(height);
+  }
+
+  @override
+  double computeMinIntrinsicHeight(double width) {
+    if (
+      _overlayContent ||
+      _scrollDirectionVertical && _positionAxis == HeaderPositionAxis.crossAxis ||
+      !_scrollDirectionVertical && _positionAxis == HeaderPositionAxis.mainAxis
+    ) {
+      return _contentBox.getMinIntrinsicHeight(width);
+    }
+
+    return _contentBox.getMinIntrinsicHeight(width) + _headerBox.getMinIntrinsicHeight(width);
+  }
+
+  @override
+  double computeMaxIntrinsicHeight(double width) {
+    if (
+      _overlayContent ||
+      _scrollDirectionVertical && _positionAxis == HeaderPositionAxis.crossAxis ||
+      !_scrollDirectionVertical && _positionAxis == HeaderPositionAxis.mainAxis
+    ) {
+      return _contentBox.getMinIntrinsicHeight(width);
+    }
+
+    return _contentBox.getMinIntrinsicHeight(width) + _headerBox.getMinIntrinsicHeight(width);
+  }
+
   bool get _scrollDirectionVertical => _scrollableAxisVertical(scrollable.axisDirection);
 
   bool get _alignmentStart => _mainAxisAlignment == HeaderMainAxisAlignment.start;
@@ -299,8 +393,8 @@ class StickyListItemRenderObject<I> extends RenderStack {
   }
 
   double get _contentDirectionSize => _scrollDirectionVertical
-      ? _contentBox.size.height
-      : _contentBox.size.width;
+      ? size.height
+      : size.width;
 
   double get _headerDirectionSize => _scrollDirectionVertical
       ? _headerBox.size.height
@@ -391,7 +485,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
       case HeaderCrossAxisAlignment.center:
         if (mainAxisAlignment == HeaderMainAxisAlignment.start) {
-          return vertical ? Alignment.centerLeft : Alignment.topCenter;
+          return vertical ? Alignment.topCenter : Alignment.centerLeft;
         }
 
         return vertical ? Alignment.bottomCenter : Alignment.centerRight;
