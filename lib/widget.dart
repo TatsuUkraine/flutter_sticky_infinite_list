@@ -73,7 +73,7 @@ class InfiniteListItem<I> {
 
   final bool _overlayContent;
 
-  InfiniteListItem({
+  const InfiniteListItem({
     @required this.contentBuilder,
     this.headerBuilder,
     this.headerStateBuilder,
@@ -84,7 +84,7 @@ class InfiniteListItem<I> {
   }): _overlayContent = false,
       initialHeaderBuild = true;
 
-  InfiniteListItem.overlay({
+  const InfiniteListItem.overlay({
     @required this.contentBuilder,
     this.headerBuilder,
     this.headerStateBuilder,
@@ -425,6 +425,10 @@ class StickyListItem<I> extends Stack {
     Key key,
   })
       : _overlayContent = false,
+        assert(
+          positionAxis == HeaderPositionAxis.mainAxis || crossAxisAlignment != HeaderCrossAxisAlignment.center,
+          'Center cross axis alignment can\'t be used with Cross axis positioning'
+        ),
         super(
           key: key,
           children: [content, header],
