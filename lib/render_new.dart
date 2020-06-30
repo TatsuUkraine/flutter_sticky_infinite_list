@@ -10,6 +10,17 @@ enum HeaderPositionAxis {
   crossAxis,
 }
 
+enum HeaderMainAxisAlignment {
+  start,
+  end,
+}
+
+enum HeaderCrossAxisAlignment {
+  start,
+  center,
+  end,
+}
+
 class StickyListItemRenderObject<I> extends RenderStack {
   ScrollableState _scrollable;
   StreamSink<StickyState<I>> _streamSink;
@@ -17,6 +28,8 @@ class StickyListItemRenderObject<I> extends RenderStack {
   MinOffsetProvider<I> _minOffsetProvider;
   bool _overlayContent;
   HeaderPositionAxis _headerPositionAxis;
+  HeaderMainAxisAlignment _mainAxisAlignment;
+  HeaderCrossAxisAlignment _crossAxisAlignment;
 
   double _lastOffset;
   bool _headerOverflow = false;
@@ -26,19 +39,22 @@ class StickyListItemRenderObject<I> extends RenderStack {
     @required I itemIndex,
     MinOffsetProvider<I> minOffsetProvider,
     StreamSink<StickyState<I>> streamSink,
-    AlignmentGeometry alignment,
     TextDirection textDirection,
     Overflow overflow,
     bool overlayContent,
     HeaderPositionAxis headerPositionAxis,
+    HeaderMainAxisAlignment mainAxisAlignment,
+    HeaderCrossAxisAlignment crossAxisAlignment,
   })  : _scrollable = scrollable,
         _streamSink = streamSink,
         _itemIndex = itemIndex,
         _minOffsetProvider = minOffsetProvider,
         _overlayContent = overlayContent,
         _headerPositionAxis = headerPositionAxis,
+        _mainAxisAlignment = mainAxisAlignment,
+        _crossAxisAlignment = crossAxisAlignment,
         super(
-          alignment: alignment,
+          alignment: _headerAlignment(scrollable, mainAxisAlignment, crossAxisAlignment),
           textDirection: textDirection,
           fit: StackFit.loose,
           overflow: overflow,
@@ -74,6 +90,16 @@ class StickyListItemRenderObject<I> extends RenderStack {
   set headerPositionAxis(HeaderPositionAxis headerPositionAxis) {
     _headerPositionAxis = headerPositionAxis;
     markNeedsPaint();
+  }
+
+  set mainAxisAlignment(HeaderMainAxisAlignment axisAlignment) {
+    _mainAxisAlignment = axisAlignment;
+    alignment = _headerAlignment(scrollable, _mainAxisAlignment, _crossAxisAlignment);
+  }
+
+  set crossAxisAlignment(HeaderCrossAxisAlignment axisAlignment) {
+    _crossAxisAlignment = axisAlignment;
+    alignment = _headerAlignment(scrollable, _mainAxisAlignment, _crossAxisAlignment);
   }
 
   ScrollableState get scrollable => _scrollable;
@@ -129,6 +155,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
   void performLayout() {
     final BoxConstraints constraints = this.constraints;
     final RenderBox content = _contentBox;
+    final RenderBox header = _headerBox;
 
     content.layout(constraints.loosen(), parentUsesSize: true);
 
@@ -138,7 +165,6 @@ class StickyListItemRenderObject<I> extends RenderStack {
     double height = max(constraints.minHeight, childSize.height);
 
     if (!_overlayContent) {
-      final RenderBox header = _headerBox;
       final Size headerSize = header.size;
 
       switch (_headerPositionAxis) {
@@ -168,9 +194,13 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
     assert(size.isFinite);
 
-    final StackParentData childParentData = content.parentData as StackParentData;
+    final StackParentData contentParentData = content.parentData as StackParentData;
 
-    childParentData.offset = Offset.zero;
+    contentParentData.offset = Offset.zero;
+
+    final StackParentData headerParentData = _headerBox.parentData as StackParentData;
+
+    RenderStack.layoutPositionedChild(_headerBox, headerParentData, size, alignment);
   }
 
   void updateHeaderOffset() {
@@ -192,7 +222,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
       contentSize: contentSize,
     );
 
-    final double headerOffset = _getHeaderOffset(
+    final double headerOffset = _calculateHeaderOffset(
       contentSize,
       stuckOffset,
       headerSize,
@@ -213,7 +243,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
         sticky: _isSticky(
           state,
           headerOffset,
-          _getHeaderOffset(
+          _calculateHeaderOffset(
             contentSize,
             stuckOffset,
             headerSize
@@ -226,21 +256,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
   bool get _scrollDirectionVertical =>
       [AxisDirection.up, AxisDirection.down].contains(scrollable.axisDirection);
 
-  bool get _alignmentStart {
-    if (_scrollDirectionVertical) {
-      return [
-        AlignmentDirectional.topStart,
-        AlignmentDirectional.topCenter,
-        AlignmentDirectional.topEnd,
-      ].contains(alignment);
-    }
-
-    return [
-      AlignmentDirectional.topStart,
-      AlignmentDirectional.bottomStart,
-      AlignmentDirectional.centerStart,
-    ].contains(alignment);
-  }
+  bool get _alignmentStart => _mainAxisAlignment == HeaderMainAxisAlignment.start;
 
   double get _scrollableSize {
     final viewportContainer = _viewport;
@@ -310,7 +326,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
     return contentSize - offset;
   }
 
-  double _getHeaderOffset(
+  double _calculateHeaderOffset(
     double contentSize,
     double stuckOffset,
     double headerSize,
@@ -351,5 +367,34 @@ class StickyListItemRenderObject<I> extends RenderStack {
       state.position > 0 &&
       state.position < 1
     );
+  }
+
+  static AlignmentGeometry _headerAlignment(ScrollableState scrollable, HeaderMainAxisAlignment mainAxisAlignment, HeaderCrossAxisAlignment crossAxisAlignment) {
+    final bool vertical = [AxisDirection.up, AxisDirection.down].contains(scrollable.axisDirection);
+
+    switch (crossAxisAlignment) {
+
+      case HeaderCrossAxisAlignment.end:
+        if (mainAxisAlignment == HeaderMainAxisAlignment.end) {
+          return Alignment.bottomRight;
+        }
+
+        return vertical ? Alignment.bottomLeft : Alignment.topRight;
+
+      case HeaderCrossAxisAlignment.center:
+        if (mainAxisAlignment == HeaderMainAxisAlignment.start) {
+          return vertical ? Alignment.centerLeft : Alignment.topCenter;
+        }
+
+        return vertical ? Alignment.centerRight : Alignment.bottomCenter;
+
+      case HeaderCrossAxisAlignment.start:
+      default:
+        if (mainAxisAlignment == HeaderMainAxisAlignment.start) {
+          return Alignment.topLeft;
+        }
+
+        return vertical ? Alignment.topRight : Alignment.bottomLeft;
+    }
   }
 }
