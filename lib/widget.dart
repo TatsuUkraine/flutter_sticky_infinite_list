@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-import './render_new.dart';
+import './render.dart';
 import 'models/sticky_state.dart';
 import 'models/types.dart';
 import 'models/alignments.dart';
