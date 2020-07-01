@@ -9,13 +9,15 @@ class StickyState<I> {
   ///
   /// `1.0` - max end position
   ///
-  /// If [InfiniteListItem.initialHeaderBuild] is true, initial
-  /// header render will be with position = 0
+  /// If [InfiniteListItem.initialHeaderBuild] is true with [InfiniteListItem.overlay],
+  /// or default [InfiniteListItem] constructor is used,
+  /// initial header render will be with position = 0
   final double position;
 
   /// Number of pixels, that outside of viewport
   ///
-  /// If [InfiniteListItem.initialHeaderBuild] is true, initial
+  /// If [InfiniteListItem.initialHeaderBuild] is true with [InfiniteListItem.overlay],
+  /// or default [InfiniteListItem] constructor is used,
   /// header render will be with offset = 0
   ///
   /// For header bottom positions (or right positions for horizontal)
@@ -39,8 +41,9 @@ class StickyState<I> {
 
   /// Scroll item height.
   ///
-  /// If [InfiniteListItem.initialHeaderBuild] is true, initial
-  /// header render will be called without this value
+  /// If [InfiniteListItem.initialHeaderBuild] is true with [InfiniteListItem.overlay],
+  /// or default [InfiniteListItem] constructor is used,
+  /// initial header render will be called without this value
   final double contentSize;
 
   StickyState(this.index, {

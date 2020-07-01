@@ -81,7 +81,7 @@ class InfiniteListItem<I> {
   final EdgeInsets padding;
 
   /// If header should overlay content or not
-  final bool _overlayContent;
+  final bool overlayContent;
 
   /// Default list item constructor with relative header positioning
   const InfiniteListItem({
@@ -93,7 +93,7 @@ class InfiniteListItem<I> {
     this.crossAxisAlignment = HeaderCrossAxisAlignment.start,
     this.positionAxis = HeaderPositionAxis.mainAxis,
     this.padding,
-  }): _overlayContent = false,
+  }): overlayContent = false,
       initialHeaderBuild = true;
 
   /// List item constructor with overlayed header positioning
@@ -108,7 +108,7 @@ class InfiniteListItem<I> {
     this.padding,
   })
       : positionAxis = HeaderPositionAxis.mainAxis,
-        _overlayContent = true;
+        overlayContent = true;
 
   /// Defines if list item has Header
   bool get hasStickyHeader =>
@@ -373,7 +373,7 @@ class _StickySliverListItemState<I> extends State<_StickySliverListItem<I>> {
       return content;
     }
 
-    if (widget.listItem._overlayContent) {
+    if (widget.listItem.overlayContent) {
       return StickyListItem<I>.overlay(
         itemIndex: widget.index,
         streamSink: widget.streamController.sink,
@@ -442,7 +442,7 @@ class StickyListItem<I> extends Stack {
   final HeaderPositionAxis positionAxis;
 
   /// Defines if header should overlay content
-  final bool _overlayContent;
+  final bool overlayContent;
 
   /// Default sticky item constructor with relative header positioning
   StickyListItem({
@@ -456,7 +456,7 @@ class StickyListItem<I> extends Stack {
     this.positionAxis = HeaderPositionAxis.mainAxis,
     Key key,
   })
-      : _overlayContent = false,
+      : overlayContent = false,
         assert(
           positionAxis == HeaderPositionAxis.mainAxis || crossAxisAlignment != HeaderCrossAxisAlignment.center,
           'Center cross axis alignment can\'t be used with Cross axis positioning'
@@ -480,7 +480,7 @@ class StickyListItem<I> extends Stack {
     this.crossAxisAlignment = HeaderCrossAxisAlignment.start,
     Key key,
   })
-      : _overlayContent = true,
+      : overlayContent = true,
         positionAxis = HeaderPositionAxis.mainAxis,
         super(
           key: key,
@@ -499,7 +499,7 @@ class StickyListItem<I> extends Stack {
         crossAxisAlignment: crossAxisAlignment,
         positionAxis: positionAxis,
         textDirection: textDirection ?? Directionality.of(context),
-        overlayContent: _overlayContent,
+        overlayContent: overlayContent,
         overflow: overflow,
         itemIndex: itemIndex,
         streamSink: streamSink,
@@ -520,7 +520,7 @@ class StickyListItem<I> extends Stack {
         ..mainAxisAlignment = mainAxisAlignment
         ..crossAxisAlignment = crossAxisAlignment
         ..positionAxis = positionAxis
-        ..overlayContent = _overlayContent;
+        ..overlayContent = overlayContent;
     }
   }
 }

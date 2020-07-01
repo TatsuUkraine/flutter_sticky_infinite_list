@@ -88,6 +88,38 @@ class Example extends StatelessWidget {
 }
 ```
 
+Or with header overlay content
+```dart
+
+import 'package:sticky_infinite_list/sticky_infinite_list.dart';
+
+class Example extends StatelessWidget {
+  
+  @override
+  Widget build(BuildContext context) {
+    return InfiniteList(
+      builder: (BuildContext context, int index) {
+        /// Builder requires [InfiniteList] to be returned
+        return InfiniteListItem.overlay(
+          /// Header builder
+          headerBuilder: (BuildContext context) {
+            return Container(
+              ///...
+            );
+          },
+          /// Content builder
+          contentBuilder: (BuildContext context) {
+            return Container(
+              ///...
+            );
+          },
+        );
+      }
+    );
+  }
+}
+```
+
 ### State
 
 When min offset callback invoked or header builder is invoked
@@ -230,18 +262,32 @@ InfiniteListItem(
   /// to define when header should be stick to the bottom of
   /// content.
   /// 
-  /// If this method not provided or it returns `0`,
+  /// If this method returns `0`,
   /// header will be in sticky state until list item
   /// will be visible inside view port
+  /// 
+  /// If this method not provided or it returns null, header
+  /// will be sticky until offset equals to 
+  /// header size
   minOffsetProvider: (StickyState<int> state) {},
   
-  /// Header alignment
-  /// 
-  /// Use [HeaderAlignment] to align header to left,
-  /// right, top or bottom side
-  /// 
-  /// Optional. Default value [HeaderAlignment.topLeft]
-  headerAlignment: HeaderAlignment.topLeft,
+  /// Header alignment against main axis direction
+  ///
+  /// See [HeaderMainAxisAlignment] for more info
+  HeaderMainAxisAlignment mainAxisAlignment: HeaderMainAxisAlignment.start,
+
+  /// Header alignment against cross axis direction
+  ///
+  /// See [HeaderCrossAxisAlignment] for more info
+  HeaderCrossAxisAlignment crossAxisAlignment: HeaderCrossAxisAlignment.start,
+
+  /// Header position against scroll axis for relative positioned headers
+  ///
+  /// Only for relative header positioning
+  HeaderPositionAxis positionAxis: HeaderPositionAxis.mainAxis,
+
+  /// List item padding, see [EdgeInsets] for more info
+  EdgeInsets padding: const EdgeInsets.all(8.0),
   
   /// Scroll direction
   ///
@@ -330,14 +376,30 @@ Luckily you can extend and override base `InfiniteListItem` class
 
 ```dart
 /// Generic `I` is index type, by default list item uses `int`
-class SomeCustomListItem extends InfiniteListItem<I> {
-  /// Header alignment
-  /// 
-  /// Supports all sides alignment, see [HeaderAlignment] for more info
-  /// 
-  /// By default [HeaderAlignment.topLeft]
-  final HeaderAlignment headerAlignment;
-  
+
+class SomeCustomListItem<I> extends InfiniteListItem<I> {
+  /// Header alignment against main axis direction
+  ///
+  /// See [HeaderMainAxisAlignment] for more info
+  @override
+  final HeaderMainAxisAlignment mainAxisAlignment = HeaderMainAxisAlignment.start;
+
+  /// Header alignment against cross axis direction
+  ///
+  /// See [HeaderCrossAxisAlignment] for more info
+  @override
+  final HeaderCrossAxisAlignment crossAxisAlignment = HeaderCrossAxisAlignment.start;
+
+  /// Header position against scroll axis for relative positioned headers
+  ///
+  /// See [HeaderPositionAxis] for more info
+  @override
+  final HeaderPositionAxis positionAxis = HeaderPositionAxis.mainAxis;
+
+  /// If header should overlay content or not
+  @override
+  final bool overlayContent = false;
+
   /// Let item builder know if it should watch
   /// header position changes
   /// 
@@ -345,7 +407,7 @@ class SomeCustomListItem extends InfiniteListItem<I> {
   /// each time header position changes
   @override
   bool get watchStickyState => true;
-  
+
   /// Let item builder know that this class
   /// provides header
   /// 
@@ -353,7 +415,7 @@ class SomeCustomListItem extends InfiniteListItem<I> {
   /// and never called
   @override
   bool get hasStickyHeader => true;
-  
+
   /// This methods builds header
   /// 
   /// If [watchStickyState] is `true`,
@@ -366,24 +428,24 @@ class SomeCustomListItem extends InfiniteListItem<I> {
   /// Also in that case `state` will be `null`
   @override
   Widget buildHeader(BuildContext context, [StickyState<I> state]) {}
-  
+
   /// Content item builder
   /// 
   /// This method invoked only once
   @override
-  Widget buildContent(BuildContext context) => {}
+  Widget buildContent(BuildContext context) {}
 
-  /// Called during init state (see Statefull widget [State.initState])
+  /// Called during init state (see [Statefull] widget [State.initState])
   /// 
-  /// For additional information about Statefull widget `initState`
+  /// For additional information about [Statefull] widget `initState`
   /// lifecycle - see Flutter docs
   @protected
   @mustCallSuper
   void initState() {}
 
-  /// Called during item dispose (see Statefull widget [State.dispose])
+  /// Called during item dispose (see [Statefull] widget [State.dispose])
   /// 
-  /// For additional information about Statefull widget `dispose`
+  /// For additional information about [Statefull] widget `dispose`
   /// lifecycle - see Flutter docs
   @protected
   @mustCallSuper
@@ -393,11 +455,9 @@ class SomeCustomListItem extends InfiniteListItem<I> {
 
 #### Need more override?..
 
-**If you get any problems with this type of override,
- please create an issue**
-
 Alongside with list item override, to use inside `InfiniteList` builder,
-you can also use `StickyListItem`, that exposed by this package too, independently.
+you can also use or extend `StickyListItem`, that exposed by this
+package too, independently.
 
 This class uses `Stream` to inform it's parent about header position changes
 
