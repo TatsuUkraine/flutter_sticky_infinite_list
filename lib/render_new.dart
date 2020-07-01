@@ -148,111 +148,22 @@ class StickyListItemRenderObject<I> extends RenderStack {
   @override
   void performLayout() {
     final BoxConstraints constraints = this.constraints;
-    final RenderBox content = _contentBox;
     final RenderBox header = _headerBox;
 
     final BoxConstraints containerConstraints = constraints.loosen();
 
     header.layout(containerConstraints, parentUsesSize: true);
 
-    final StackParentData contentParentData = content.parentData as StackParentData;
+    size = _layoutContent(containerConstraints, header.size);
 
-    contentParentData.offset = Offset.zero;
-
-    double width = constraints.minWidth;
-    double height = constraints.minHeight;
-
-    /// todo: rewrite this block
-    if (!_overlayContent) {
-      final Size headerSize = header.size;
-
-      switch (_positionAxis) {
-        case HeaderPositionAxis.mainAxis:
-          if (_scrollDirectionVertical) {
-            if (_mainAxisAlignment == HeaderMainAxisAlignment.start) {
-              contentParentData.offset = Offset(0, headerSize.height);
-            }
-
-            content.layout(containerConstraints.copyWith(
-              maxHeight: containerConstraints.maxHeight - headerSize.height
-            ), parentUsesSize: true);
-
-            Size contentSize = content.size;
-
-            width = contentSize.width;
-            height = contentSize.height + headerSize.height;
-
-            break;
-          }
-
-          if (_mainAxisAlignment == HeaderMainAxisAlignment.start) {
-            contentParentData.offset = Offset(headerSize.width, 0);
-          }
-
-          content.layout(containerConstraints.copyWith(
-            maxWidth: containerConstraints.maxWidth - headerSize.width
-          ), parentUsesSize: true);
-
-          Size contentSize = content.size;
-
-          width = contentSize.width + headerSize.width;
-          height = contentSize.height;
-
-          break;
-
-        case HeaderPositionAxis.crossAxis:
-          if (_scrollDirectionVertical) {
-            if (_crossAxisAlignment == HeaderCrossAxisAlignment.start) {
-              contentParentData.offset = Offset(headerSize.width, 0);
-            }
-
-            content.layout(containerConstraints.copyWith(
-              maxWidth: containerConstraints.maxWidth - headerSize.width
-            ), parentUsesSize: true);
-
-            Size contentSize = content.size;
-
-            width = contentSize.width + headerSize.width;
-            height = contentSize.height;
-
-            break;
-          }
-
-          if (_crossAxisAlignment == HeaderCrossAxisAlignment.start) {
-            contentParentData.offset = Offset(0, headerSize.height);
-          }
-
-          content.layout(containerConstraints.copyWith(
-            maxHeight: containerConstraints.maxHeight - headerSize.height
-          ), parentUsesSize: true);
-
-          Size contentSize = content.size;
-
-          width = contentSize.width;
-          height = contentSize.height + headerSize.height;
-
-          break;
-      }
-    } else {
-      content.layout(containerConstraints, parentUsesSize: true);
-
-      Size contentSize = content.size;
-
-      width = contentSize.width;
-      height = contentSize.height;
-    }
-
-    size = Size(width, height);
-    assert(size.width == constraints.constrainWidth(width));
-    assert(size.height == constraints.constrainHeight(height));
+    assert(size.width == constraints.constrainWidth(size.width));
+    assert(size.height == constraints.constrainHeight(size.height));
 
     assert(size.isFinite);
 
     final StackParentData headerParentData = header.parentData as StackParentData;
 
     headerParentData.offset = alignment.resolve(textDirection).alongOffset(size - header.size as Offset);
-
-    //RenderStack.layoutPositionedChild(header, headerParentData, size, alignment);
   }
 
   void updateHeaderOffset() {
@@ -470,6 +381,74 @@ class StickyListItemRenderObject<I> extends RenderStack {
       state.position > 0 &&
       state.position < 1
     );
+  }
+
+  Size _layoutContent(BoxConstraints constraints, Size headerSize) {
+    final RenderBox content = _contentBox;
+    final StackParentData contentParentData = content.parentData as StackParentData;
+
+    if (!_overlayContent) {
+      final bool alignmentStart = _mainAxisAlignment ==
+          HeaderMainAxisAlignment.start ||
+          _crossAxisAlignment == HeaderCrossAxisAlignment.start;
+
+      if (
+      (
+          _positionAxis == HeaderPositionAxis.crossAxis &&
+              _scrollDirectionVertical
+      ) ||
+          (
+              _positionAxis == HeaderPositionAxis.mainAxis &&
+                  !_scrollDirectionVertical
+          )
+      ) {
+        content.layout(constraints.copyWith(
+            maxWidth: constraints.maxWidth - headerSize.width
+        ), parentUsesSize: true);
+
+        if (alignmentStart) {
+          contentParentData.offset = Offset(headerSize.width, 0);
+        }
+
+        final Size contentSize = content.size;
+
+        return Size(
+            contentSize.width + headerSize.width,
+            contentSize.height
+        );
+      }
+
+      if (
+      (
+          _positionAxis == HeaderPositionAxis.mainAxis &&
+              _scrollDirectionVertical
+      ) ||
+          (
+              _positionAxis == HeaderPositionAxis.crossAxis &&
+                  !_scrollDirectionVertical
+          )
+      ) {
+        content.layout(constraints.copyWith(
+            maxHeight: constraints.maxHeight - headerSize.height
+        ), parentUsesSize: true);
+
+        if (alignmentStart) {
+          contentParentData.offset = Offset(0, headerSize.height);
+        }
+
+        final Size contentSize = content.size;
+
+        return Size(
+            contentSize.width,
+            contentSize.height + headerSize.height
+        );
+      }
+    }
+
+    content.layout(constraints, parentUsesSize: true);
+    contentParentData.offset = Offset.zero;
+
+    return content.size;
   }
 
   static AlignmentGeometry _headerAlignment(ScrollableState scrollable, HeaderMainAxisAlignment mainAxisAlignment, HeaderCrossAxisAlignment crossAxisAlignment) {
