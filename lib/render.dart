@@ -164,7 +164,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
     final StackParentData headerParentData = header.parentData as StackParentData;
 
-    headerParentData.offset = alignment.resolve(textDirection).alongOffset(size - header.size as Offset);
+    headerParentData.offset = alignment.resolve(TextDirection.ltr).alongOffset(size - header.size as Offset);
   }
 
   void updateHeaderOffset() {
