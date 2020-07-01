@@ -1,3 +1,13 @@
+## [2.0.0] - 2020-07-02
+
+**Features**
+- refactor sticky item layout calculation
+- split alignment param on main and cross axis alignment
+- added relative positioning for header
+  [#19](https://github.com/TatsuUkraine/flutter_sticky_infinite_list/issues/19)
+
+**Release contains breaking changes, see MIGRATION.md for more details**
+
 ## [1.3.0] - 2020-04-28
 
 **Features**
