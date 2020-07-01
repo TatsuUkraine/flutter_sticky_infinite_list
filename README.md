@@ -306,7 +306,17 @@ InfiniteListItem(
 
 #### Header alignment demo
 
-<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/blob/bdd86fd0bbe8183fc4adda631b8dea353b7afa98/doc/images/header_position.gif?raw=true" width="50%" />
+Relative positioning
+
+<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/raw/28c70054b5a11a4ba22e9a1a2b6b76b892c441b3/doc/images/header_position.gif" width="50%" />
+
+Relative cross axis positioning
+
+<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/raw/28c70054b5a11a4ba22e9a1a2b6b76b892c441b3/doc/images/header_cross_position.gif" width="50%" />
+
+Overlay positioning
+
+<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/raw/28c70054b5a11a4ba22e9a1a2b6b76b892c441b3/doc/images/header_position_overlay.gif" width="50%" />
 
 #### Horizontal scroll demo
 
