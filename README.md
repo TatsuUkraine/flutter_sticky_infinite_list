@@ -32,6 +32,11 @@ benefits for performance that Flutter provides.
 - dynamic header build on content scroll
 - dynamic min offset calculation on content scroll
 
+## Migration guide
+
+If you using older MAJOR versions, please
+[visit this migration guide](https://github.com/TatsuUkraine/flutter_sticky_infinite_list/blob/master/MIGRATION.md)
+
 ## Demo
 
 <img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/blob/bdd86fd0bbe8183fc4adda631b8dea353b7afa98/doc/images/base_scroll.gif?raw=true" width="50%" />
