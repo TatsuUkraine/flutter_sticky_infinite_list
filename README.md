@@ -374,7 +374,7 @@ class Example extends StatelessWidget {
 
 #### Demo
 
-<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/blob/41fe9c321842cbfc24df509ddd142c5756a9162f/doc/images/reverse_scroll.gif?raw=true" width="50%" />
+<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/raw/e7a35fba60c9f4da97e84131a8c342424819aae7/doc/images/reverse_scroll.gif" width="50%" />
 
 For more info take a look at
 [Example](https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example) project
