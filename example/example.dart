@@ -19,14 +19,14 @@ class Example extends StatelessWidget {
       /// Will be ignored if [direction] is forward
       ///
       /// If it's `null`, list will be infinite
-      minChildCount: -100,
+      negChildCount: 100,
 
       /// Render 100 elements in positive direction. `Optional`
       ///
       /// If it's not provided, scroll will be infinite in positive direction
       ///
       /// If it's `null`, list will be infinite
-      maxChildCount: 100,
+      posChildCount: 100,
 
       /// ViewPort anchor value. See [ScrollView] docs for more info
       anchor: 0.0,

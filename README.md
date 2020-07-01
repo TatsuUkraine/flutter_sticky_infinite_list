@@ -195,21 +195,19 @@ InfiniteList(
   /// If you need infinite list in both directions use `InfiniteListDirection.multi`
   direction: InfiniteListDirection.multi,
   
-  /// Min child count.
+  /// Negative max child count.
   /// 
   /// Will be used only when `direction: InfiniteListDirection.multi`
   /// 
-  /// Accepts negative values only
-  /// 
   /// If it's not provided, scroll will be infinite in negative direction
-  minChildCount: -100,
+  negChildCount: 100,
   
-  /// Max child count
+  /// Positive max child count
   /// 
   /// Specifies number of elements for forward list
   /// 
   /// If it's not provided, scroll will be infinite in positive direction
-  maxChildCount: 100,
+  posChildCount: 100,
   
   /// ScrollView anchor value.
   anchor: 0.0,
@@ -314,8 +312,8 @@ InfiniteListItem(
 Currently package doesn't support `CustomScrollView.reverse` option.
 
 But same result can be achieved with defining `anchor = 1` and
-`maxChildCount = 0`. In that way viewport center will be stick
-to the bottom and positive list won't render anything.
+`posChildCount = 0`. In that way viewport center will be stick to the
+bottom and positive list won't render anything.
 
 Additionally you can specify header alignment to any side.
 
@@ -331,7 +329,7 @@ class Example extends StatelessWidget {
       
       direction: InfiniteListDirection.multi,
       
-      maxChildCount: 0,
+      posChildCount: 0,
       
       builder: (BuildContext context, int index) {
         /// Builder requires [InfiniteList] to be returned

@@ -194,15 +194,12 @@ class InfiniteList extends StatefulWidget {
   final InfiniteListDirection direction;
 
   /// Max child count for positive direction list
-  final int maxChildCount;
+  final int posChildCount;
 
   /// Max child count for negative list direction
   ///
   /// Ignored when [direction] is [InfiniteListDirection.single]
-  ///
-  /// This value should have negative value in order to provide right calculation
-  /// for negative list
-  final int minChildCount;
+  final int negChildCount;
 
   /// Proxy property for [ScrollView.reverse]
   ///
@@ -236,8 +233,8 @@ class InfiniteList extends StatefulWidget {
     @required this.builder,
     this.controller,
     this.direction = InfiniteListDirection.single,
-    this.maxChildCount,
-    this.minChildCount,
+    this.posChildCount,
+    this.negChildCount,
     //this.reverse = false,
     this.anchor = 0.0,
     this.cacheExtent,
@@ -254,15 +251,12 @@ class _InfiniteListState extends State<InfiniteList> {
   StreamController<StickyState> _streamController =
       StreamController<StickyState<int>>.broadcast();
 
-  int get _reverseChildCount =>
-      widget.minChildCount == null ? null : widget.minChildCount * -1;
-
   SliverList get _reverseList =>
       SliverList(
         delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) =>
               _buildListItem(context, (index + 1) * -1),
-          childCount: _reverseChildCount,
+          childCount: widget.negChildCount,
         ),
       );
 
@@ -270,7 +264,7 @@ class _InfiniteListState extends State<InfiniteList> {
       SliverList(
         delegate: SliverChildBuilderDelegate(
           _buildListItem,
-          childCount: widget.maxChildCount,
+          childCount: widget.posChildCount,
         ),
         key: widget._centerKey,
       );
