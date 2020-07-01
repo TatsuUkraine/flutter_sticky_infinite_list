@@ -3,6 +3,7 @@
 **Features**
 - refactor sticky item layout calculation
 - split alignment param on main and cross axis alignment
+- added padding property to `InfiniteListItem`
 - added relative positioning for header
   [#19](https://github.com/TatsuUkraine/flutter_sticky_infinite_list/issues/19)
 
