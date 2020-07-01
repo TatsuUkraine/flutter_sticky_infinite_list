@@ -493,12 +493,24 @@ Widget build(BuildContext context) {
           child: Placeholder(),
         ),
         StickyListItem<String>(
+          streamSink: _headerStream.sink, /// stream to update header during scroll
           header: Container(
-            height: 30,
+            height: _headerHeight,
             width: double.infinity,
             color: Colors.orange,
             child: Center(
-              child: Text('Sticky Header')
+              child: StreamBuilder<StickyState<String>>(
+                stream: _headerStream.stream, /// stream to update header during scroll
+                builder: (_, snapshot) {
+                  if (!snapshot.hasData) {
+                    return Container();
+                  }
+
+                  final position = (snapshot.data.position * 100).round();
+
+                  return Text('Positioned relative. Position: $position%');
+                },
+              ),
             ),
           ),
           content: Container(
@@ -506,7 +518,35 @@ Widget build(BuildContext context) {
             color: Colors.blueAccent,
             child: Placeholder(),
           ),
-          itemIndex: 'single-child-index',
+          itemIndex: "single-child",
+        ),
+        StickyListItem<String>.overlay(
+          streamSink: _headerOverlayStream.sink, /// stream to update header during scroll
+          header: Container(
+            height: _headerHeight,
+            width: double.infinity,
+            color: Colors.orange,
+            child: Center(
+              child: StreamBuilder<StickyState<String>>(
+                stream: _headerOverlayStream.stream, /// stream to update header during scroll
+                builder: (_, snapshot) {
+                  if (!snapshot.hasData) {
+                    return Container();
+                  }
+
+                  final position = (snapshot.data.position * 100).round();
+
+                  return Text('Positioned overlay. Position: $position%');
+                },
+              ),
+            ),
+          ),
+          content: Container(
+            height: height,
+            color: Colors.lightBlueAccent,
+            child: Placeholder(),
+          ),
+          itemIndex: "single-overlayed-child",
         ),
         Container(
           height: height,
@@ -519,12 +559,12 @@ Widget build(BuildContext context) {
 }
 ```
 
-This code will render single child scroll
-with 3 widgets. Middle one - item with sticky header.
+This code will render single child scroll with 4 widgets. Two middle
+items - items with sticky header.
 
 **Demo**
 
-<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/blob/5dabe8503ad2d578f9b07018d2d1c76a61a258ef/doc/images/single-scroll.gif?raw=true" width="50%" />
+<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/raw/450dffae4a4e3a10496aa5dacf267e1511fe7cee/doc/images/single-scroll.gif" width="50%" />
 
 For more complex example please take a look at "Single Example" page
 in [Example project](https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example)
