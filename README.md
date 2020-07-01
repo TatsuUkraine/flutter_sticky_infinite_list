@@ -320,7 +320,7 @@ Overlay positioning
 
 #### Horizontal scroll demo
 
-<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/blob/bdd86fd0bbe8183fc4adda631b8dea353b7afa98/doc/images/horizontal_scroll.gif?raw=true" width="50%" />
+<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/raw/ab9ec55223c2a60192559fed553634a7f358b002/doc/images/horizontal_scroll.gif" width="50%" />
 
 ### Reverse infinite scroll
 
