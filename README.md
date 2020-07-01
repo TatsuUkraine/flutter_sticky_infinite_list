@@ -317,7 +317,7 @@ But same result can be achieved with defining `anchor = 1` and
 `maxChildCount = 0`. In that way viewport center will be stick
 to the bottom and positive list won't render anything.
 
-Additionally you can specify `headerAlignment` to any side.
+Additionally you can specify header alignment to any side.
 
 ```dart
 import 'package:sticky_infinite_list/sticky_infinite_list.dart';
@@ -337,7 +337,8 @@ class Example extends StatelessWidget {
         /// Builder requires [InfiniteList] to be returned
         return InfiniteListItem(
         
-          headerAlignment: HeaderAlignment.bottomLeft,
+          mainAxisAlignment: HeaderMainAxisAlignment.end,
+          crossAxisAlignment: HeaderCrossAxisAlignment.start,
           
           /// Header builder
           headerBuilder: (BuildContext context) {
