@@ -387,67 +387,81 @@ class StickyListItemRenderObject<I> extends RenderStack {
   Size _layoutContent(BoxConstraints constraints, Size headerSize) {
     final RenderBox content = _contentBox;
     final StackParentData contentParentData = content.parentData as StackParentData;
+    contentParentData.offset = Offset.zero;
 
     if (!_overlayContent) {
-      final bool alignmentStart = _mainAxisAlignment ==
-          HeaderMainAxisAlignment.start ||
-          _crossAxisAlignment == HeaderCrossAxisAlignment.start;
-
       if (
-      (
+        (
           _positionAxis == HeaderPositionAxis.crossAxis &&
-              _scrollDirectionVertical
-      ) ||
-          (
-              _positionAxis == HeaderPositionAxis.mainAxis &&
-                  !_scrollDirectionVertical
-          )
+          _scrollDirectionVertical
+        ) ||
+        (
+          _positionAxis == HeaderPositionAxis.mainAxis &&
+          !_scrollDirectionVertical
+        )
       ) {
         content.layout(constraints.copyWith(
             maxWidth: constraints.maxWidth - headerSize.width
         ), parentUsesSize: true);
 
-        if (alignmentStart) {
+        if (
+          (
+            _crossAxisAlignment == HeaderCrossAxisAlignment.start &&
+            _scrollDirectionVertical
+          ) ||
+          (
+            _mainAxisAlignment == HeaderMainAxisAlignment.start &&
+            !_scrollDirectionVertical
+          )
+        ) {
           contentParentData.offset = Offset(headerSize.width, 0);
         }
 
         final Size contentSize = content.size;
 
         return Size(
-            contentSize.width + headerSize.width,
-            contentSize.height
+          contentSize.width + headerSize.width,
+          contentSize.height
         );
       }
 
       if (
-      (
+        (
           _positionAxis == HeaderPositionAxis.mainAxis &&
-              _scrollDirectionVertical
-      ) ||
-          (
-              _positionAxis == HeaderPositionAxis.crossAxis &&
-                  !_scrollDirectionVertical
-          )
+          _scrollDirectionVertical
+        ) ||
+        (
+          _positionAxis == HeaderPositionAxis.crossAxis &&
+          !_scrollDirectionVertical
+        )
       ) {
         content.layout(constraints.copyWith(
             maxHeight: constraints.maxHeight - headerSize.height
         ), parentUsesSize: true);
 
-        if (alignmentStart) {
+        if (
+          (
+            _mainAxisAlignment == HeaderMainAxisAlignment.start &&
+            _scrollDirectionVertical
+          ) ||
+          (
+            _crossAxisAlignment == HeaderCrossAxisAlignment.start &&
+            !_scrollDirectionVertical
+          )
+        ) {
           contentParentData.offset = Offset(0, headerSize.height);
         }
 
         final Size contentSize = content.size;
 
         return Size(
-            contentSize.width,
-            contentSize.height + headerSize.height
+          contentSize.width,
+          contentSize.height + headerSize.height
         );
       }
     }
 
     content.layout(constraints, parentUsesSize: true);
-    contentParentData.offset = Offset.zero;
 
     return content.size;
   }
