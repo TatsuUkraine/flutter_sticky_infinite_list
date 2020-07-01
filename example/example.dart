@@ -19,14 +19,14 @@ class Example extends StatelessWidget {
       /// Will be ignored if [direction] is forward
       ///
       /// If it's `null`, list will be infinite
-      minChildCount: -100,
+      negChildCount: 100,
 
       /// Render 100 elements in positive direction. `Optional`
       ///
       /// If it's not provided, scroll will be infinite in positive direction
       ///
       /// If it's `null`, list will be infinite
-      maxChildCount: 100,
+      posChildCount: 100,
 
       /// ViewPort anchor value. See [ScrollView] docs for more info
       anchor: 0.0,
@@ -35,11 +35,6 @@ class Example extends StatelessWidget {
       builder: (BuildContext context, int index) {
         /// Builder requires [InfiniteList] to be returned
         return InfiniteListItem(
-          /// If header should be build during initial render.
-          ///
-          /// Will be ignored with just [headerBuilder] builder specified
-          initialHeaderBuild: true,
-
           /// Header builder with state
           ///
           /// Will be invoked each time header changes it's position
@@ -92,15 +87,21 @@ class Example extends StatelessWidget {
           /// of container
           minOffsetProvider: (StickyState<int> state) => 50,
 
-          /// Header alignment
+          /// Header alignment against main axis
           ///
-          /// Currently it supports top left,
-          /// top right, bottom left and bottom right alignments
+          /// By default [HeaderMainAxisAlignment.start]
+          mainAxisAlignment: HeaderMainAxisAlignment.start,
+
+          /// Header alignment against main axis
           ///
-          /// By default [HeaderAlignment.topLeft]
-          headerAlignment: HeaderAlignment.topLeft,
+          /// By default [HeaderCrossAxisAlignment.start]
+          crossAxisAlignment: HeaderCrossAxisAlignment.start,
 
 
+          /// Header alignment placement against scroll axis
+          ///
+          /// By default [HeaderPositionAxis.mainAxis]
+          positionAxis: HeaderPositionAxis.mainAxis,
         );
       }
     );

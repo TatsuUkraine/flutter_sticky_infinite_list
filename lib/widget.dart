@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import './state.dart';
+
 import './render.dart';
+import 'models/sticky_state.dart';
+import 'models/types.dart';
+import 'models/alignments.dart';
 
 typedef InfiniteListItem<I> ItemBuilder<I>(BuildContext context, I index);
 
@@ -13,16 +16,14 @@ typedef InfiniteListItem<I> ItemBuilder<I>(BuildContext context, I index);
 ///
 /// This class build item header and content
 class InfiniteListItem<I> {
+  /// Header builder based on [StickyState]
   final HeaderStateBuilder<I> headerStateBuilder;
-  final HeaderBuilder headerBuilder;
-  final ContentBuilder contentBuilder;
 
-  /// Header alignment
-  ///
-  /// By default [HeaderAlignment.topLeft]
-  ///
-  /// For more option take a look in [HeaderAlignment]
-  final HeaderAlignment headerAlignment;
+  /// Header builder
+  final HeaderBuilder headerBuilder;
+
+  /// Content builder
+  final ContentBuilder contentBuilder;
 
   /// Function, that provides min offset.
   ///
@@ -53,20 +54,71 @@ class InfiniteListItem<I> {
   ///
   /// For case when only [headerBuilder] is defined,
   /// this property will be ignored
+  ///
+  /// If it's relative header positioning ([InfiniteListItem.overlay] constructor is used),
+  /// this property always will be `true`, which means that with relative
+  /// positioning, header will be built with basic [StickyState] object.
+  ///
+  /// It's required due to layout container and define it's actual dimensions
   final bool initialHeaderBuild;
 
-  InfiniteListItem({
+  /// Header alignment against main axis direction.
+  ///
+  /// Affects header stick side.
+  ///
+  /// See [HeaderMainAxisAlignment] for more info
+  final HeaderMainAxisAlignment mainAxisAlignment;
+
+  /// Header alignment against cross axis direction
+  ///
+  /// See [HeaderCrossAxisAlignment] for more info
+  final HeaderCrossAxisAlignment crossAxisAlignment;
+
+  /// Header position against scroll axis for relative positioned headers
+  ///
+  /// See [HeaderPositionAxis] for more info
+  final HeaderPositionAxis positionAxis;
+
+  /// List item padding, see [EdgeInsets] for more info
+  final EdgeInsets padding;
+
+  /// If header should overlay content or not
+  final bool overlayContent;
+
+  /// Default list item constructor with relative header positioning
+  const InfiniteListItem({
     @required this.contentBuilder,
     this.headerBuilder,
     this.headerStateBuilder,
     this.minOffsetProvider,
-    this.headerAlignment = HeaderAlignment.topLeft,
-    this.initialHeaderBuild = false,
-  });
+    this.mainAxisAlignment = HeaderMainAxisAlignment.start,
+    this.crossAxisAlignment = HeaderCrossAxisAlignment.start,
+    this.positionAxis = HeaderPositionAxis.mainAxis,
+    this.padding,
+  }): overlayContent = false,
+      initialHeaderBuild = true;
 
+  /// List item constructor with overlayed header positioning
+  const InfiniteListItem.overlay({
+    @required this.contentBuilder,
+    this.headerBuilder,
+    this.headerStateBuilder,
+    this.minOffsetProvider,
+    this.initialHeaderBuild = false,
+    this.mainAxisAlignment = HeaderMainAxisAlignment.start,
+    this.crossAxisAlignment = HeaderCrossAxisAlignment.start,
+    this.padding,
+  })
+      : positionAxis = HeaderPositionAxis.mainAxis,
+        overlayContent = true;
+
+  /// Defines if list item has Header
   bool get hasStickyHeader =>
       headerBuilder != null || headerStateBuilder != null;
 
+  /// Defines if list item should watch header position state changes.
+  ///
+  /// It's true if [headerStateBuilder] was provided instead of [headerBuilder]
   bool get watchStickyState => headerStateBuilder != null;
 
   /// Header item builder
@@ -97,25 +149,23 @@ class InfiniteListItem<I> {
   @mustCallSuper
   void dispose() {}
 
-  Widget _getHeader(BuildContext context, Stream<StickyState<I>> stream, I index) {
+  Widget _buildHeader(BuildContext context, Stream<StickyState<I>> stream, I index) {
     assert(hasStickyHeader, "At least one builder should be provided");
 
     if (!watchStickyState) {
       return buildHeader(context);
     }
 
-    return Positioned(
-      child: StreamBuilder<StickyState<I>>(
-        stream: stream,
-        initialData: initialHeaderBuild ? StickyState<I>(index) : null,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Container();
-          }
+    return StreamBuilder<StickyState<I>>(
+      stream: stream,
+      initialData: initialHeaderBuild ? StickyState<I>(index) : null,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Container();
+        }
 
-          return buildHeader(context, snapshot.data);
-        },
-      ),
+        return buildHeader(context, snapshot.data);
+      },
     );
   }
 }
@@ -146,15 +196,12 @@ class InfiniteList extends StatefulWidget {
   final InfiniteListDirection direction;
 
   /// Max child count for positive direction list
-  final int maxChildCount;
+  final int posChildCount;
 
   /// Max child count for negative list direction
   ///
   /// Ignored when [direction] is [InfiniteListDirection.single]
-  ///
-  /// This value should have negative value in order to provide right calculation
-  /// for negative list
-  final int minChildCount;
+  final int negChildCount;
 
   /// Proxy property for [ScrollView.reverse]
   ///
@@ -188,8 +235,8 @@ class InfiniteList extends StatefulWidget {
     @required this.builder,
     this.controller,
     this.direction = InfiniteListDirection.single,
-    this.maxChildCount,
-    this.minChildCount,
+    this.posChildCount,
+    this.negChildCount,
     //this.reverse = false,
     this.anchor = 0.0,
     this.cacheExtent,
@@ -206,28 +253,25 @@ class _InfiniteListState extends State<InfiniteList> {
   StreamController<StickyState> _streamController =
       StreamController<StickyState<int>>.broadcast();
 
-  int get _reverseChildCount =>
-      widget.minChildCount == null ? null : widget.minChildCount * -1;
-
   SliverList get _reverseList =>
       SliverList(
         delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) =>
-              _getListItem(context, (index + 1) * -1),
-          childCount: _reverseChildCount,
+              _buildListItem(context, (index + 1) * -1),
+          childCount: widget.negChildCount,
         ),
       );
 
   SliverList get _forwardList =>
       SliverList(
         delegate: SliverChildBuilderDelegate(
-          _getListItem,
-          childCount: widget.maxChildCount,
+          _buildListItem,
+          childCount: widget.posChildCount,
         ),
         key: widget._centerKey,
       );
 
-  Widget _getListItem(BuildContext context, int index) =>
+  Widget _buildListItem(BuildContext context, int index) =>
       _StickySliverListItem<int>(
         streamController: _streamController,
         index: index,
@@ -287,39 +331,7 @@ class _StickySliverListItem<I> extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<_StickySliverListItem<I>> createState() =>
-      _StickySliverListItemState<I>();
-
-  /// Maps sticky header alignment values
-  /// to [AlignmentDirectional] variant
-  AlignmentDirectional get alignment {
-    switch (listItem.headerAlignment) {
-      case HeaderAlignment.centerLeft:
-        return AlignmentDirectional.centerStart;
-
-      case HeaderAlignment.centerRight:
-        return AlignmentDirectional.centerEnd;
-
-      case HeaderAlignment.bottomLeft:
-        return AlignmentDirectional.bottomStart;
-
-      case HeaderAlignment.bottomCenter:
-        return AlignmentDirectional.bottomCenter;
-
-      case HeaderAlignment.bottomRight:
-        return AlignmentDirectional.bottomEnd;
-
-      case HeaderAlignment.bottomCenter:
-        return AlignmentDirectional.bottomCenter;
-
-      case HeaderAlignment.topRight:
-        return AlignmentDirectional.topEnd;
-
-      case HeaderAlignment.topLeft:
-      default:
-        return AlignmentDirectional.topStart;
-    }
-  }
+  State<_StickySliverListItem<I>> createState() => _StickySliverListItemState<I>();
 }
 
 class _StickySliverListItemState<I> extends State<_StickySliverListItem<I>> {
@@ -331,24 +343,15 @@ class _StickySliverListItemState<I> extends State<_StickySliverListItem<I>> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final Widget content = widget.listItem.buildContent(context);
 
-    if (!widget.listItem.hasStickyHeader) {
-      return content;
+  Widget build(BuildContext context) {
+    if (widget.listItem.padding == null) {
+      return _buildItem(context);
     }
 
-    return StickyListItem<I>(
-      itemIndex: widget.index,
-      streamSink: widget.streamController.sink,
-      header: widget.listItem._getHeader(
-        context,
-        widget._stream,
-        widget.index
-      ),
-      content: content,
-      minOffsetProvider: widget.listItem.minOffsetProvider,
-      alignment: widget.alignment,
+    return Padding(
+      padding: widget.listItem.padding,
+      child: _buildItem(context),
     );
   }
 
@@ -357,6 +360,45 @@ class _StickySliverListItemState<I> extends State<_StickySliverListItem<I>> {
     super.dispose();
 
     widget.listItem.dispose();
+  }
+
+  Widget _buildItem(BuildContext context) {
+    final Widget content = widget.listItem.buildContent(context);
+
+    if (!widget.listItem.hasStickyHeader) {
+      return content;
+    }
+
+    if (widget.listItem.overlayContent) {
+      return StickyListItem<I>.overlay(
+        itemIndex: widget.index,
+        streamSink: widget.streamController.sink,
+        header: widget.listItem._buildHeader(
+          context,
+          widget._stream,
+          widget.index
+        ),
+        content: content,
+        minOffsetProvider: widget.listItem.minOffsetProvider,
+        mainAxisAlignment: widget.listItem.mainAxisAlignment,
+        crossAxisAlignment: widget.listItem.crossAxisAlignment,
+      );
+    }
+
+    return StickyListItem<I>(
+      itemIndex: widget.index,
+      streamSink: widget.streamController.sink,
+      header: widget.listItem._buildHeader(
+        context,
+        widget._stream,
+        widget.index
+      ),
+      content: content,
+      minOffsetProvider: widget.listItem.minOffsetProvider,
+      mainAxisAlignment: widget.listItem.mainAxisAlignment,
+      crossAxisAlignment: widget.listItem.crossAxisAlignment,
+      positionAxis: widget.listItem.positionAxis,
+    );
   }
 }
 
@@ -375,21 +417,72 @@ class StickyListItem<I> extends Stack {
   /// during stream event emit
   final I itemIndex;
 
-  /// Callback function that tells when header to stick to the bottom
+  /// Callback function that tells when header to stick to the bottom.
+  ///
+  /// If it returns `null` or callback not provided - min offset will be header height
   final MinOffsetProvider<I> minOffsetProvider;
 
+  /// Header alignment against main axis direction
+  ///
+  /// Affects header stick side.
+  ///
+  /// See [HeaderMainAxisAlignment] for more info
+  final HeaderMainAxisAlignment mainAxisAlignment;
+
+  /// Header alignment against cross axis direction
+  ///
+  /// See [HeaderCrossAxisAlignment] for more info
+  final HeaderCrossAxisAlignment crossAxisAlignment;
+
+  /// Header position against scroll axis for relative positioned headers
+  ///
+  /// See [HeaderPositionAxis] for more info
+  final HeaderPositionAxis positionAxis;
+
+  /// Defines if header should overlay content
+  final bool overlayContent;
+
+  /// Default sticky item constructor with relative header positioning
   StickyListItem({
     @required Widget header,
     @required Widget content,
     @required this.itemIndex,
     this.minOffsetProvider,
     this.streamSink,
-    AlignmentDirectional alignment,
+    this.mainAxisAlignment = HeaderMainAxisAlignment.start,
+    this.crossAxisAlignment = HeaderCrossAxisAlignment.start,
+    this.positionAxis = HeaderPositionAxis.mainAxis,
     Key key,
-  }) : super(
+  })
+      : overlayContent = false,
+        assert(
+          positionAxis == HeaderPositionAxis.mainAxis || crossAxisAlignment != HeaderCrossAxisAlignment.center,
+          'Center cross axis alignment can\'t be used with Cross axis positioning'
+        ),
+        super(
           key: key,
           children: [content, header],
-          alignment: alignment ?? AlignmentDirectional.topStart,
+          overflow: Overflow.clip,
+        );
+
+  /// Default sticky item constructor with overlayed header positioning.
+  ///
+  /// Header position axis in this case will be against main axis always.
+  StickyListItem.overlay({
+    @required Widget header,
+    @required Widget content,
+    @required this.itemIndex,
+    this.minOffsetProvider,
+    this.streamSink,
+    this.mainAxisAlignment = HeaderMainAxisAlignment.start,
+    this.crossAxisAlignment = HeaderCrossAxisAlignment.start,
+    Key key,
+  })
+      : overlayContent = true,
+        positionAxis = HeaderPositionAxis.mainAxis,
+        super(
+          key: key,
+          children: [content, header],
           overflow: Overflow.clip,
         );
 
@@ -400,9 +493,11 @@ class StickyListItem<I> extends Stack {
   RenderStack createRenderObject(BuildContext context) =>
       StickyListItemRenderObject<I>(
         scrollable: _getScrollableState(context),
-        alignment: alignment,
+        mainAxisAlignment: mainAxisAlignment,
+        crossAxisAlignment: crossAxisAlignment,
+        positionAxis: positionAxis,
         textDirection: textDirection ?? Directionality.of(context),
-        fit: fit,
+        overlayContent: overlayContent,
         overflow: overflow,
         itemIndex: itemIndex,
         streamSink: streamSink,
@@ -419,7 +514,11 @@ class StickyListItem<I> extends Stack {
         ..scrollable = _getScrollableState(context)
         ..itemIndex = itemIndex
         ..streamSink = streamSink
-        ..minOffsetProvider = minOffsetProvider;
+        ..minOffsetProvider = minOffsetProvider
+        ..mainAxisAlignment = mainAxisAlignment
+        ..crossAxisAlignment = crossAxisAlignment
+        ..positionAxis = positionAxis
+        ..overlayContent = overlayContent;
     }
   }
 }
