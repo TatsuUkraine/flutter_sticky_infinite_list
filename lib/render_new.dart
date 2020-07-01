@@ -9,6 +9,8 @@ import 'models/sticky_state.dart';
 import 'models/types.dart';
 
 ///todo: rename file, remove old render object
+///
+/// Sticky item render object based on [RenderStack]
 class StickyListItemRenderObject<I> extends RenderStack {
   ScrollableState _scrollable;
   StreamSink<StickyState<I>> _streamSink;

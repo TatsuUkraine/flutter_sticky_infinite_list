@@ -54,6 +54,12 @@ class InfiniteListItem<I> {
   ///
   /// For case when only [headerBuilder] is defined,
   /// this property will be ignored
+  ///
+  /// If it's relative header positioning ([InfiniteListItem.overlay] constructor is used),
+  /// this property always will be `true`, which means that with relative
+  /// positioning, header will be built with basic [StickyState] object.
+  ///
+  /// It's required due to layout container and define it's actual dimensions
   final bool initialHeaderBuild;
 
   /// Header alignment against main axis direction
@@ -74,8 +80,10 @@ class InfiniteListItem<I> {
   /// List item padding, see [EdgeInsets] for more info
   final EdgeInsets padding;
 
+  /// If header should overlay content or not
   final bool _overlayContent;
 
+  /// Default list item constructor with relative header positioning
   const InfiniteListItem({
     @required this.contentBuilder,
     this.headerBuilder,
@@ -88,6 +96,7 @@ class InfiniteListItem<I> {
   }): _overlayContent = false,
       initialHeaderBuild = true;
 
+  /// List item constructor with overlayed header positioning
   const InfiniteListItem.overlay({
     @required this.contentBuilder,
     this.headerBuilder,
@@ -101,9 +110,13 @@ class InfiniteListItem<I> {
       : positionAxis = HeaderPositionAxis.mainAxis,
         _overlayContent = true;
 
+  /// Defines if list item has Header
   bool get hasStickyHeader =>
       headerBuilder != null || headerStateBuilder != null;
 
+  /// Defines if list item should watch header position state changes.
+  ///
+  /// It's true if [headerStateBuilder] was provided instead of [headerBuilder]
   bool get watchStickyState => headerStateBuilder != null;
 
   /// Header item builder
@@ -408,7 +421,9 @@ class StickyListItem<I> extends Stack {
   /// during stream event emit
   final I itemIndex;
 
-  /// Callback function that tells when header to stick to the bottom
+  /// Callback function that tells when header to stick to the bottom.
+  ///
+  /// If it returns `null` or callback not provided - min offset will be header height
   final MinOffsetProvider<I> minOffsetProvider;
 
   /// Header alignment against main axis direction
@@ -426,8 +441,10 @@ class StickyListItem<I> extends Stack {
   /// See [HeaderPositionAxis] for more info
   final HeaderPositionAxis positionAxis;
 
+  /// Defines if header should overlay content
   final bool _overlayContent;
 
+  /// Default sticky item constructor with relative header positioning
   StickyListItem({
     @required Widget header,
     @required Widget content,
@@ -450,6 +467,9 @@ class StickyListItem<I> extends Stack {
           overflow: Overflow.clip,
         );
 
+  /// Default sticky item constructor with overlayed header positioning.
+  ///
+  /// Header position axis in this case will be against main axis always.
   StickyListItem.overlay({
     @required Widget header,
     @required Widget content,
