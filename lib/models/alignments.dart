@@ -1,13 +1,24 @@
 /// Header position axis for content without header overflow
 enum HeaderPositionAxis {
   /// Align against main axis direction
+  ///
+  /// For vertical scroll column direction will be used, for
+  /// horizontal scroll - row
   mainAxis,
 
   /// Align against cross axis direction
+  ///
+  /// For vertical scroll row direction will be used, for
+  /// horizontal scroll - column
   crossAxis,
 }
 
 /// Main axis direction alignment
+///
+/// For vertical scroll, header will be aligned to the top and bottom edges.
+/// For horizontal scroll header will be aligned to the left and right edges
+///
+/// It also affect side where sticky header will be sticked.
 enum HeaderMainAxisAlignment {
   /// Start position against main axis
   ///

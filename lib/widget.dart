@@ -62,7 +62,9 @@ class InfiniteListItem<I> {
   /// It's required due to layout container and define it's actual dimensions
   final bool initialHeaderBuild;
 
-  /// Header alignment against main axis direction
+  /// Header alignment against main axis direction.
+  ///
+  /// Affects header stick side.
   ///
   /// See [HeaderMainAxisAlignment] for more info
   final HeaderMainAxisAlignment mainAxisAlignment;
@@ -421,6 +423,8 @@ class StickyListItem<I> extends Stack {
   final MinOffsetProvider<I> minOffsetProvider;
 
   /// Header alignment against main axis direction
+  ///
+  /// Affects header stick side.
   ///
   /// See [HeaderMainAxisAlignment] for more info
   final HeaderMainAxisAlignment mainAxisAlignment;
