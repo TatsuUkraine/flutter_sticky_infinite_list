@@ -1,47 +1,3 @@
-import 'package:flutter/widgets.dart';
-
-typedef Widget ContentBuilder(BuildContext context);
-typedef Widget HeaderStateBuilder<I>(
-    BuildContext context, StickyState<I> state);
-typedef Widget HeaderBuilder(BuildContext context);
-typedef double MinOffsetProvider<I>(StickyState<I> state);
-
-/// List direction variants
-enum InfiniteListDirection {
-  /// Render only positive infinite list
-  single,
-
-  /// Render both positive and negative infinite lists
-  multi,
-}
-
-/// Alignment options
-///
-/// [HeaderAlignment.bottomLeft], [HeaderAlignment.bottomRight] and
-/// [HeaderAlignment.bottomCenter] header will be positioned
-/// against content bottom edge for vertical scroll
-///
-/// [HeaderAlignment.topRight], [HeaderAlignment.bottomRight] and
-/// [HeaderAlignment.canterRight] header will be positioned
-/// against content right edge for horizontal scroll
-///
-/// Which also means that headers will become sticky, when content
-/// bottom edge (or right edge for horizontal) will
-/// go outside of ViewPort bottom (right for horizontal) edge
-///
-/// It also affects on [StickyState.offset] value, since in that case
-/// hidden size will be calculated against bottom edges
-enum HeaderAlignment {
-  topLeft,
-  topCenter,
-  topRight,
-  bottomLeft,
-  bottomCenter,
-  bottomRight,
-  centerLeft,
-  centerRight,
-}
-
 /// Sticky state object
 /// that describes header position and content height
 class StickyState<I> {
@@ -53,13 +9,15 @@ class StickyState<I> {
   ///
   /// `1.0` - max end position
   ///
-  /// If [InfiniteListItem.initialHeaderBuild] is true, initial
-  /// header render will be with position = 0
+  /// If [InfiniteListItem.initialHeaderBuild] is true with [InfiniteListItem.overlay],
+  /// or default [InfiniteListItem] constructor is used,
+  /// initial header render will be with position = 0
   final double position;
 
   /// Number of pixels, that outside of viewport
   ///
-  /// If [InfiniteListItem.initialHeaderBuild] is true, initial
+  /// If [InfiniteListItem.initialHeaderBuild] is true with [InfiniteListItem.overlay],
+  /// or default [InfiniteListItem] constructor is used,
   /// header render will be with offset = 0
   ///
   /// For header bottom positions (or right positions for horizontal)
@@ -83,8 +41,9 @@ class StickyState<I> {
 
   /// Scroll item height.
   ///
-  /// If [InfiniteListItem.initialHeaderBuild] is true, initial
-  /// header render will be called without this value
+  /// If [InfiniteListItem.initialHeaderBuild] is true with [InfiniteListItem.overlay],
+  /// or default [InfiniteListItem] constructor is used,
+  /// initial header render will be called without this value
   final double contentSize;
 
   StickyState(this.index, {
