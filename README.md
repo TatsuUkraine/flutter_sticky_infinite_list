@@ -39,7 +39,7 @@ If you using older MAJOR versions, please
 
 ## Demo
 
-<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/blob/bdd86fd0bbe8183fc4adda631b8dea353b7afa98/doc/images/base_scroll.gif?raw=true" width="50%" />
+<img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/raw/2277e153e7c723bca0a746b2730c5abef4cfe25e/doc/images/base_scroll.gif" width="50%" />
 
 ## Getting Started
 
