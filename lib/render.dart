@@ -151,11 +151,19 @@ class StickyListItemRenderObject<I> extends RenderStack {
     final BoxConstraints constraints = this.constraints;
     final RenderBox header = _headerBox;
 
+    double constraintWidth = constraints.minWidth;
+    double constraintHeight = constraints.minHeight;
+
     final BoxConstraints containerConstraints = constraints.loosen();
 
     header.layout(containerConstraints, parentUsesSize: true);
 
-    size = _layoutContent(containerConstraints, header.size);
+    final Size containerSize = _layoutContent(containerConstraints, header.size);
+
+    size = Size(
+      max(constraintWidth, containerSize.width),
+      max(constraintHeight, containerSize.height)
+    );
 
     assert(size.width == constraints.constrainWidth(size.width));
     assert(size.height == constraints.constrainHeight(size.height));
@@ -421,7 +429,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
         return Size(
           contentSize.width + headerSize.width,
-          contentSize.height
+          max(contentSize.height, headerSize.height)
         );
       }
 
@@ -455,15 +463,19 @@ class StickyListItemRenderObject<I> extends RenderStack {
         final Size contentSize = content.size;
 
         return Size(
-          contentSize.width,
+          max(contentSize.width, headerSize.width),
           contentSize.height + headerSize.height
         );
       }
     }
 
     content.layout(constraints, parentUsesSize: true);
+    final Size contentSize = content.size;
 
-    return content.size;
+    return Size(
+      max(contentSize.width, headerSize.width),
+      max(contentSize.height, headerSize.height),
+    );
   }
 
   static AlignmentGeometry _headerAlignment(ScrollableState scrollable, HeaderMainAxisAlignment mainAxisAlignment, HeaderCrossAxisAlignment crossAxisAlignment) {
