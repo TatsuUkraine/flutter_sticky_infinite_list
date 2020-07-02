@@ -408,9 +408,13 @@ class StickyListItemRenderObject<I> extends RenderStack {
           !_scrollDirectionVertical
         )
       ) {
-        content.layout(constraints.copyWith(
-            maxWidth: constraints.maxWidth - headerSize.width
-        ), parentUsesSize: true);
+        content.layout(
+          constraints.copyWith(
+            maxWidth: constraints.maxWidth - headerSize.width,
+            minHeight: headerSize.height,
+          ),
+          parentUsesSize: true,
+        );
 
         if (
           (
@@ -443,9 +447,13 @@ class StickyListItemRenderObject<I> extends RenderStack {
           !_scrollDirectionVertical
         )
       ) {
-        content.layout(constraints.copyWith(
-            maxHeight: constraints.maxHeight - headerSize.height
-        ), parentUsesSize: true);
+        content.layout(
+          constraints.copyWith(
+            maxHeight: constraints.maxHeight - headerSize.height,
+            minWidth: headerSize.width,
+          ),
+          parentUsesSize: true,
+        );
 
         if (
           (
@@ -469,7 +477,13 @@ class StickyListItemRenderObject<I> extends RenderStack {
       }
     }
 
-    content.layout(constraints, parentUsesSize: true);
+    content.layout(
+      constraints.copyWith(
+        minHeight: headerSize.height,
+        minWidth: headerSize.width,
+      ),
+      parentUsesSize: true,
+    );
     final Size contentSize = content.size;
 
     return Size(
