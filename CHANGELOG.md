@@ -1,3 +1,9 @@
+## [2.0.1] - 2020-07-02
+
+**Bug fixes**
+- fixed constraint exceptions
+- fixed min size calculation when content smaller than header
+
 ## [2.0.0] - 2020-07-02
 
 **Features**
