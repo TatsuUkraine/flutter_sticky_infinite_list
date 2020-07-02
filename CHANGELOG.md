@@ -1,3 +1,8 @@
+## [2.1.0] - 2020-07-02
+
+**Feature**
+- allow content alignment against list item container
+
 ## [2.0.1] - 2020-07-02
 
 **Bug fixes**
