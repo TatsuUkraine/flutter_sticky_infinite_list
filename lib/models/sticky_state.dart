@@ -46,24 +46,23 @@ class StickyState<I> {
   /// initial header render will be called without this value
   final double contentSize;
 
-  StickyState(this.index, {
-    this.position = 0,
-    this.offset = 0,
-    this.sticky = false,
-    this.contentSize
-  });
+  StickyState(this.index,
+      {this.position = 0,
+      this.offset = 0,
+      this.sticky = false,
+      this.contentSize});
 
   /// Create state duplicate, with optional state options override
-  StickyState<I> copyWith({
-    double position,
-    double offset,
-    bool sticky,
-    double contentHeight
-  }) => StickyState<I>(
-    index,
-    position: position ?? this.position,
-    offset: offset ?? this.offset,
-    sticky: sticky ?? this.sticky,
-    contentSize: contentHeight ?? this.contentSize,
-  );
+  StickyState<I> copyWith(
+          {double position,
+          double offset,
+          bool sticky,
+          double contentHeight}) =>
+      StickyState<I>(
+        index,
+        position: position ?? this.position,
+        offset: offset ?? this.offset,
+        sticky: sticky ?? this.sticky,
+        contentSize: contentHeight ?? this.contentSize,
+      );
 }

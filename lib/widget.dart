@@ -95,8 +95,8 @@ class InfiniteListItem<I> {
     this.crossAxisAlignment = HeaderCrossAxisAlignment.start,
     this.positionAxis = HeaderPositionAxis.mainAxis,
     this.padding,
-  }): overlayContent = false,
-      initialHeaderBuild = true;
+  })  : overlayContent = false,
+        initialHeaderBuild = true;
 
   /// List item constructor with overlayed header positioning
   const InfiniteListItem.overlay({
@@ -108,8 +108,7 @@ class InfiniteListItem<I> {
     this.mainAxisAlignment = HeaderMainAxisAlignment.start,
     this.crossAxisAlignment = HeaderCrossAxisAlignment.start,
     this.padding,
-  })
-      : positionAxis = HeaderPositionAxis.mainAxis,
+  })  : positionAxis = HeaderPositionAxis.mainAxis,
         overlayContent = true;
 
   /// Defines if list item has Header
@@ -149,7 +148,8 @@ class InfiniteListItem<I> {
   @mustCallSuper
   void dispose() {}
 
-  Widget _buildHeader(BuildContext context, Stream<StickyState<I>> stream, I index) {
+  Widget _buildHeader(
+      BuildContext context, Stream<StickyState<I>> stream, I index) {
     assert(hasStickyHeader, "At least one builder should be provided");
 
     if (!watchStickyState) {
@@ -242,7 +242,8 @@ class InfiniteList extends StatefulWidget {
     this.cacheExtent,
     this.scrollDirection = Axis.vertical,
     this.physics,
-  })  : _centerKey = (direction == InfiniteListDirection.multi) ? UniqueKey() : null,
+  })  : _centerKey =
+            (direction == InfiniteListDirection.multi) ? UniqueKey() : null,
         super(key: key);
 
   @override
@@ -253,8 +254,7 @@ class _InfiniteListState extends State<InfiniteList> {
   StreamController<StickyState> _streamController =
       StreamController<StickyState<int>>.broadcast();
 
-  SliverList get _reverseList =>
-      SliverList(
+  SliverList get _reverseList => SliverList(
         delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) =>
               _buildListItem(context, (index + 1) * -1),
@@ -262,8 +262,7 @@ class _InfiniteListState extends State<InfiniteList> {
         ),
       );
 
-  SliverList get _forwardList =>
-      SliverList(
+  SliverList get _forwardList => SliverList(
         delegate: SliverChildBuilderDelegate(
           _buildListItem,
           childCount: widget.posChildCount,
@@ -296,15 +295,15 @@ class _InfiniteListState extends State<InfiniteList> {
 
   @override
   Widget build(BuildContext context) => CustomScrollView(
-    controller: widget.controller,
-    center: widget._centerKey,
-    slivers: _slivers,
-    reverse: widget.reverse,
-    anchor: widget.anchor,
-    cacheExtent: widget.cacheExtent,
-    scrollDirection: widget.scrollDirection,
-    physics: widget.physics,
-  );
+        controller: widget.controller,
+        center: widget._centerKey,
+        slivers: _slivers,
+        reverse: widget.reverse,
+        anchor: widget.anchor,
+        cacheExtent: widget.cacheExtent,
+        scrollDirection: widget.scrollDirection,
+        physics: widget.physics,
+      );
 
   @override
   @mustCallSuper
@@ -331,7 +330,8 @@ class _StickySliverListItem<I> extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<_StickySliverListItem<I>> createState() => _StickySliverListItemState<I>();
+  State<_StickySliverListItem<I>> createState() =>
+      _StickySliverListItemState<I>();
 }
 
 class _StickySliverListItemState<I> extends State<_StickySliverListItem<I>> {
@@ -343,7 +343,6 @@ class _StickySliverListItemState<I> extends State<_StickySliverListItem<I>> {
   }
 
   @override
-
   Widget build(BuildContext context) {
     if (widget.listItem.padding == null) {
       return _buildItem(context);
@@ -373,11 +372,8 @@ class _StickySliverListItemState<I> extends State<_StickySliverListItem<I>> {
       return StickyListItem<I>.overlay(
         itemIndex: widget.index,
         streamSink: widget.streamController.sink,
-        header: widget.listItem._buildHeader(
-          context,
-          widget._stream,
-          widget.index
-        ),
+        header:
+            widget.listItem._buildHeader(context, widget._stream, widget.index),
         content: content,
         minOffsetProvider: widget.listItem.minOffsetProvider,
         mainAxisAlignment: widget.listItem.mainAxisAlignment,
@@ -388,11 +384,8 @@ class _StickySliverListItemState<I> extends State<_StickySliverListItem<I>> {
     return StickyListItem<I>(
       itemIndex: widget.index,
       streamSink: widget.streamController.sink,
-      header: widget.listItem._buildHeader(
-        context,
-        widget._stream,
-        widget.index
-      ),
+      header:
+          widget.listItem._buildHeader(context, widget._stream, widget.index),
       content: content,
       minOffsetProvider: widget.listItem.minOffsetProvider,
       mainAxisAlignment: widget.listItem.mainAxisAlignment,
@@ -453,12 +446,11 @@ class StickyListItem<I> extends Stack {
     this.crossAxisAlignment = HeaderCrossAxisAlignment.start,
     this.positionAxis = HeaderPositionAxis.mainAxis,
     Key key,
-  })
-      : overlayContent = false,
+  })  : overlayContent = false,
         assert(
-          positionAxis == HeaderPositionAxis.mainAxis || crossAxisAlignment != HeaderCrossAxisAlignment.center,
-          'Center cross axis alignment can\'t be used with Cross axis positioning'
-        ),
+            positionAxis == HeaderPositionAxis.mainAxis ||
+                crossAxisAlignment != HeaderCrossAxisAlignment.center,
+            'Center cross axis alignment can\'t be used with Cross axis positioning'),
         super(
           key: key,
           children: [content, header],
@@ -477,8 +469,7 @@ class StickyListItem<I> extends Stack {
     this.mainAxisAlignment = HeaderMainAxisAlignment.start,
     this.crossAxisAlignment = HeaderCrossAxisAlignment.start,
     Key key,
-  })
-      : overlayContent = true,
+  })  : overlayContent = true,
         positionAxis = HeaderPositionAxis.mainAxis,
         super(
           key: key,
