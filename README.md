@@ -599,5 +599,4 @@ in [Reverse infinite scroll](#reverse-infinite-scroll)
 ### Named parameter overflow isn't defined error
 
 If you get this kind of error, most likely you are using beta or dev
-FLutter channel. If so, please ensure that you're using 3.x.x
-version.
+Flutter channel. If so, please ensure that you're using 3.x.x version.
