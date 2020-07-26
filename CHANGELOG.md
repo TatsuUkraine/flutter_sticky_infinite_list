@@ -1,3 +1,7 @@
+## [3.0.0-dev.1] - 2020-07-26
+
+- update widget params according to current beta/dev Flutter changes
+
 ## [2.1.0+2] - 2020-07-15
 
 - code format updates
