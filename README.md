@@ -37,6 +37,11 @@ benefits for performance that Flutter provides.
 If you using older MAJOR versions, please
 [visit this migration guide](https://github.com/TatsuUkraine/flutter_sticky_infinite_list/blob/master/MIGRATION.md)
 
+### Property not defined
+
+If you get similar error message during the build please read [this
+section](#flutter-version-related-errors) first.
+
 ## Demo
 
 <img src="https://github.com/TatsuUkraine/flutter_sticky_infinite_list_example/raw/2277e153e7c723bca0a746b2730c5abef4cfe25e/doc/images/base_scroll.gif" width="50%" />
@@ -588,3 +593,10 @@ different way in reverse mode, comparing to regular scroll direction.
 
 But there is an workaround can be used, described
 in [Reverse infinite scroll](#reverse-infinite-scroll)
+
+## Flutter version related errors
+
+### Named parameter overflow isn't defined error
+
+If you get this kind of error, most likely you are using beta or dev
+Flutter channel. If so, please ensure that you're using 3.x.x version.
