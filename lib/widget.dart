@@ -228,6 +228,12 @@ class InfiniteList extends StatefulWidget {
   /// Proxy property for [ScrollView.physics]
   final ScrollPhysics physics;
 
+  /// Additional slivers to be placed before the list.
+  final List<Widget> sliversBefore;
+
+  /// Additional slivers to be placed after the list.
+  final List<Widget> sliversAfter;
+
   final Key _centerKey;
 
   InfiniteList({
@@ -242,6 +248,8 @@ class InfiniteList extends StatefulWidget {
     this.cacheExtent,
     this.scrollDirection = Axis.vertical,
     this.physics,
+    this.sliversBefore = const [],
+    this.sliversAfter = const [],
   })  : _centerKey =
             (direction == InfiniteListDirection.multi) ? UniqueKey() : null,
         super(key: key);
@@ -277,18 +285,22 @@ class _InfiniteListState extends State<InfiniteList> {
         listItem: widget.builder(context, index),
       );
 
-  List<SliverList> get _slivers {
+  List<Widget> get _slivers {
     switch (widget.direction) {
       case InfiniteListDirection.multi:
         return [
+          ...widget.sliversBefore,
           _reverseList,
           _forwardList,
+          ...widget.sliversAfter,
         ];
 
       case InfiniteListDirection.single:
       default:
         return [
+          ...widget.sliversBefore,
           _forwardList,
+          ...widget.sliversAfter,
         ];
     }
   }
