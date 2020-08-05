@@ -32,6 +32,11 @@ benefits for performance that Flutter provides.
 - dynamic header build on content scroll
 - dynamic min offset calculation on content scroll
 
+## Flutter before 1.20
+
+If you're using Flutter version lower than 1.20 consider using v2 of
+this package.
+
 ## Migration guide
 
 If you using older MAJOR versions, please
