@@ -34,8 +34,7 @@ benefits for performance that Flutter provides.
 
 ## Flutter before 1.20
 
-If you're using Flutter version lower than 1.20 consider using v2 of
-this package.
+If you're using Flutter version lower than 1.20 consider using v2.x.x.
 
 ## Migration guide
 
