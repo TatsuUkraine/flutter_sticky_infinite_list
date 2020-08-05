@@ -5,14 +5,14 @@ description: >-
 
   Can be customized or with config options or with override.
 
-version: 3.0.0-dev.2
+version: 3.0.0
 homepage: https://github.com/TatsuUkraine/flutter_sticky_infinite_list
 repository: https://github.com/TatsuUkraine/flutter_sticky_infinite_list
 issue_tracker: https://github.com/TatsuUkraine/flutter_sticky_infinite_list/issues
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
-  flutter: ">=1.20.0-2.0.pre"
+  flutter: ">=1.20.0"
 
 dependencies:
   flutter:
