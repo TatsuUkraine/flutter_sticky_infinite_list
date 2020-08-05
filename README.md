@@ -44,7 +44,7 @@ If you using older MAJOR versions, please
 
 ### Property not defined
 
-If you get similar kind error message during the build please read [this
+If you get similar error message during the build please read [this
 section](#flutter-version-related-errors) first.
 
 ## Demo
@@ -605,8 +605,3 @@ in [Reverse infinite scroll](#reverse-infinite-scroll)
 
 If you get this kind of error, most likely you are using Flutter 1.17.
 If so, please ensure that you're using 2.x.x version.
-
-### Named parameter overflow isn't defined error
-
-If you get this kind of error, most likely you are using Flutter 1.20 or
-higher. If so, please ensure that you're using 3.x.x version.
