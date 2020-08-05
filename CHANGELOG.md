@@ -1,6 +1,18 @@
+## [3.0.0] - 2020-08-05
+
+- stable v3 release
+
 ## [2.1.0+3] - 2020-07-26
 
 - added reference to v3 version to docs
+
+## [3.0.0-dev.2] - 2020-07-26
+
+- define min flutter version
+
+## [3.0.0-dev.1] - 2020-07-26
+
+- update widget params according to current beta/dev Flutter changes
 
 ## [2.1.0+2] - 2020-07-15
 

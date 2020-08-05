@@ -45,3 +45,17 @@ to calculate appropriate item size.
 
 `initialHeaderBuild` is still available in `overlay` constructors and
 affects header render like it was before in v1.x.x
+
+## Migration From v2.x.x to v3.x.x
+
+### Render object constructor changes
+
+In newer Flutter versions key `overflow` in `Stack` widgets and render
+objects was replaced with `clipBehavior`.
+
+Since `StickyListItemRenderObject` inherits `RenderStack`, sticky header
+render object also was updated due to changes in Flutters render object.
+
+So if you use `StickyListItemRenderObject` ensure to replace `overflow`
+param with `clipBehavior`. By default it's `Clip.hardEdge`, according to
+default `overflow` key, which was `Overflow.clip` by default

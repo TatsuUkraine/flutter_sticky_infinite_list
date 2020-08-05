@@ -32,6 +32,10 @@ benefits for performance that Flutter provides.
 - dynamic header build on content scroll
 - dynamic min offset calculation on content scroll
 
+## Flutter before 1.20
+
+If you're using Flutter version lower than 1.20 consider using v2.x.x.
+
 ## Migration guide
 
 If you using older MAJOR versions, please
@@ -596,7 +600,7 @@ in [Reverse infinite scroll](#reverse-infinite-scroll)
 
 ## Flutter version related errors
 
-### Named parameter overflow isn't defined error
+### Named parameter clipBehavior isn't defined error
 
-If you get this kind of error, most likely you are using beta or dev
-Flutter channel. If so, please ensure that you're using 3.x.x version.
+If you get this kind of error, most likely you are using Flutter 1.17.
+If so, please ensure that you're using 2.x.x version.

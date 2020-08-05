@@ -28,7 +28,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
     MinOffsetProvider<I> minOffsetProvider,
     StreamSink<StickyState<I>> streamSink,
     TextDirection textDirection,
-    Overflow overflow,
+    Clip clipBehavior = Clip.hardEdge,
     bool overlayContent,
     HeaderPositionAxis positionAxis = HeaderPositionAxis.mainAxis,
     HeaderMainAxisAlignment mainAxisAlignment = HeaderMainAxisAlignment.start,
@@ -47,7 +47,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
               scrollable, mainAxisAlignment, crossAxisAlignment),
           textDirection: textDirection,
           fit: StackFit.loose,
-          overflow: overflow,
+          clipBehavior: clipBehavior,
         );
 
   StreamSink<StickyState<I>> get streamSink => _streamSink;
@@ -142,9 +142,9 @@ class StickyListItemRenderObject<I> extends RenderStack {
   void paint(PaintingContext context, Offset paintOffset) {
     updateHeaderOffset();
 
-    if (overflow == Overflow.clip && _headerOverflow) {
+    if (clipBehavior != Clip.none && _headerOverflow) {
       context.pushClipRect(
-          needsCompositing, paintOffset, Offset.zero & size, paintStack);
+          needsCompositing, paintOffset, Offset.zero & size, paintStack, clipBehavior: clipBehavior);
     } else {
       paintStack(context, paintOffset);
     }

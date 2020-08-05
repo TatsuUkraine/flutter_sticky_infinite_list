@@ -445,6 +445,7 @@ class StickyListItem<I> extends Stack {
     this.mainAxisAlignment = HeaderMainAxisAlignment.start,
     this.crossAxisAlignment = HeaderCrossAxisAlignment.start,
     this.positionAxis = HeaderPositionAxis.mainAxis,
+    Clip clipBehavior: Clip.hardEdge,
     Key key,
   })  : overlayContent = false,
         assert(
@@ -454,7 +455,7 @@ class StickyListItem<I> extends Stack {
         super(
           key: key,
           children: [content, header],
-          overflow: Overflow.clip,
+          clipBehavior: clipBehavior,
         );
 
   /// Default sticky item constructor with overlayed header positioning.
@@ -468,13 +469,14 @@ class StickyListItem<I> extends Stack {
     this.streamSink,
     this.mainAxisAlignment = HeaderMainAxisAlignment.start,
     this.crossAxisAlignment = HeaderCrossAxisAlignment.start,
+    Clip clipBehavior: Clip.hardEdge,
     Key key,
   })  : overlayContent = true,
         positionAxis = HeaderPositionAxis.mainAxis,
         super(
           key: key,
           children: [content, header],
-          overflow: Overflow.clip,
+          clipBehavior: clipBehavior,
         );
 
   ScrollableState _getScrollableState(BuildContext context) =>
@@ -489,7 +491,7 @@ class StickyListItem<I> extends Stack {
         positionAxis: positionAxis,
         textDirection: textDirection ?? Directionality.of(context),
         overlayContent: overlayContent,
-        overflow: overflow,
+        clipBehavior: clipBehavior,
         itemIndex: itemIndex,
         streamSink: streamSink,
         minOffsetProvider: minOffsetProvider,
