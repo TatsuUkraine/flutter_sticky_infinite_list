@@ -1,3 +1,7 @@
+## [3.0.0] - 2020-08-05
+
+- stable v3 release
+
 ## [3.0.0-dev.2] - 2020-07-26
 
 - define min flutter version
