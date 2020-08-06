@@ -1,12 +1,13 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import './render.dart';
+import 'models/alignments.dart';
 import 'models/sticky_state.dart';
 import 'models/types.dart';
-import 'models/alignments.dart';
 
 typedef InfiniteListItem<I> ItemBuilder<I>(BuildContext context, I index);
 
@@ -234,6 +235,9 @@ class InfiniteList extends StatefulWidget {
   /// Additional slivers to be placed after the list.
   final List<Widget> sliversAfter;
 
+  /// Divider.
+  final Widget divider;
+
   final Key _centerKey;
 
   InfiniteList({
@@ -250,6 +254,7 @@ class InfiniteList extends StatefulWidget {
     this.physics,
     this.sliversBefore = const [],
     this.sliversAfter = const [],
+    this.divider,
   })  : _centerKey =
             (direction == InfiniteListDirection.multi) ? UniqueKey() : null,
         super(key: key);
@@ -273,17 +278,18 @@ class _InfiniteListState extends State<InfiniteList> {
   SliverList get _forwardList => SliverList(
         delegate: SliverChildBuilderDelegate(
           _buildListItem,
-          childCount: widget.posChildCount,
+          childCount: widget.posChildCount * 2 - 1,
         ),
         key: widget._centerKey,
       );
 
-  Widget _buildListItem(BuildContext context, int index) =>
-      _StickySliverListItem<int>(
-        streamController: _streamController,
-        index: index,
-        listItem: widget.builder(context, index),
-      );
+  Widget _buildListItem(BuildContext context, int index) => index.isEven
+      ? _StickySliverListItem<int>(
+          streamController: _streamController,
+          index: index,
+          listItem: widget.builder(context, index ~/ 2),
+        )
+      : widget.divider;
 
   List<Widget> get _slivers {
     switch (widget.direction) {
