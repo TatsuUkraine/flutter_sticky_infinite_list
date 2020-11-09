@@ -242,8 +242,9 @@ class InfiniteList extends StatefulWidget {
     this.cacheExtent,
     this.scrollDirection = Axis.vertical,
     this.physics,
-  })  : _centerKey =
-            (direction == InfiniteListDirection.multi) ? UniqueKey() : null,
+  })  : _centerKey = (direction == InfiniteListDirection.multi)
+            ? const ValueKey<String>('center-key')
+            : null,
         super(key: key);
 
   @override
