@@ -1,3 +1,7 @@
+## [3.0.1] - 2020-11-09
+
+- fixed positive list render on rebuild
+
 ## [3.0.0] - 2020-08-05
 
 - stable v3 release
