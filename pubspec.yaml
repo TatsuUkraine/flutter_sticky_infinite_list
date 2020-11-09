@@ -5,7 +5,7 @@ description: >-
 
   Can be customized or with config options or with override.
 
-version: 3.0.0
+version: 3.0.1
 homepage: https://github.com/TatsuUkraine/flutter_sticky_infinite_list
 repository: https://github.com/TatsuUkraine/flutter_sticky_infinite_list
 issue_tracker: https://github.com/TatsuUkraine/flutter_sticky_infinite_list/issues
