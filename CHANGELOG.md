@@ -1,3 +1,7 @@
+## [4.0.0-nullsafety.0] - 2021-02-14
+
+- migrate to null-safety
+
 ## [3.0.1] - 2020-11-09
 
 - fixed positive list render on rebuild
