@@ -481,13 +481,18 @@ class StickyListItem<I> extends Stack {
           clipBehavior: clipBehavior,
         );
 
-  ScrollableState? _getScrollableState(BuildContext context) =>
-      Scrollable.of(context)!;
+  ScrollableState _getScrollableState(BuildContext context) {
+    final ScrollableState? state = Scrollable.of(context);
+
+    assert(state != null, 'StickyListItem requires Scrollable instance');
+
+    return state!;
+  }
 
   @override
   RenderStack createRenderObject(BuildContext context) =>
       StickyListItemRenderObject<I>(
-        scrollable: _getScrollableState(context)!,
+        scrollable: _getScrollableState(context),
         mainAxisAlignment: mainAxisAlignment,
         crossAxisAlignment: crossAxisAlignment,
         positionAxis: positionAxis,
@@ -506,7 +511,7 @@ class StickyListItem<I> extends Stack {
 
     if (renderObject is StickyListItemRenderObject<I>) {
       renderObject
-        ..scrollable = _getScrollableState(context)!
+        ..scrollable = _getScrollableState(context)
         ..itemIndex = itemIndex
         ..streamSink = streamSink
         ..minOffsetProvider = minOffsetProvider
