@@ -142,7 +142,8 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
     if (clipBehavior != Clip.none && _headerOverflow) {
       context.pushClipRect(
-          needsCompositing, paintOffset, Offset.zero & size, paintStack, clipBehavior: clipBehavior);
+          needsCompositing, paintOffset, Offset.zero & size, paintStack,
+          clipBehavior: clipBehavior);
     } else {
       paintStack(context, paintOffset);
     }
@@ -184,7 +185,8 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
     final double stuckOffset = _stuckOffset;
 
-    final StackParentData parentData = _headerBox!.parentData as StackParentData;
+    final StackParentData parentData =
+        _headerBox!.parentData as StackParentData;
     final double contentSize = _contentDirectionSize;
     final double headerSize = _headerDirectionSize;
 
@@ -198,8 +200,8 @@ class StickyListItemRenderObject<I> extends RenderStack {
       contentSize: contentSize,
     );
 
-    final double headerOffset = _calculateHeaderOffset(
-        contentSize, stuckOffset, headerSize, minOffsetProvider(state as StickyState<I>));
+    final double headerOffset = _calculateHeaderOffset(contentSize, stuckOffset,
+        headerSize, minOffsetProvider(state as StickyState<I>));
 
     parentData.offset =
         _headerDirectionalOffset(parentData.offset, headerOffset);
@@ -314,8 +316,9 @@ class StickyListItemRenderObject<I> extends RenderStack {
   double get _contentDirectionSize =>
       _scrollDirectionVertical ? size.height : size.width;
 
-  double get _headerDirectionSize =>
-      _scrollDirectionVertical ? _headerBox!.size.height : _headerBox!.size.width;
+  double get _headerDirectionSize => _scrollDirectionVertical
+      ? _headerBox!.size.height
+      : _headerBox!.size.width;
 
   Offset _headerDirectionalOffset(Offset originalOffset, double offset) {
     if (_scrollDirectionVertical) {
