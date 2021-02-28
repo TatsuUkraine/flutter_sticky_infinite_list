@@ -2,8 +2,8 @@ import 'package:flutter/widgets.dart';
 
 import 'sticky_state.dart';
 
-typedef Widget ContentBuilder(BuildContext context);
-typedef Widget HeaderStateBuilder<I>(
+typedef ContentBuilder = Widget Function(BuildContext context);
+typedef HeaderStateBuilder<I> = Widget Function(
     BuildContext context, StickyState<I> state);
-typedef Widget HeaderBuilder(BuildContext context);
-typedef double MinOffsetProvider<I>(StickyState<I> state);
+typedef HeaderBuilder = Widget Function(BuildContext context);
+typedef MinOffsetProvider<I> = double? Function(StickyState<I> state);

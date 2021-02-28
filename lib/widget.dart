@@ -8,7 +8,8 @@ import 'models/sticky_state.dart';
 import 'models/types.dart';
 import 'models/alignments.dart';
 
-typedef InfiniteListItem<I> ItemBuilder<I>(BuildContext context, I index);
+typedef ItemBuilder<I> = InfiniteListItem<I> Function(
+    BuildContext context, I index);
 
 /// List item build should return instance on this class
 ///
@@ -17,10 +18,10 @@ typedef InfiniteListItem<I> ItemBuilder<I>(BuildContext context, I index);
 /// This class build item header and content
 class InfiniteListItem<I> {
   /// Header builder based on [StickyState]
-  final HeaderStateBuilder<I> headerStateBuilder;
+  final HeaderStateBuilder<I>? headerStateBuilder;
 
   /// Header builder
-  final HeaderBuilder headerBuilder;
+  final HeaderBuilder? headerBuilder;
 
   /// Content builder
   final ContentBuilder contentBuilder;
@@ -31,7 +32,7 @@ class InfiniteListItem<I> {
   /// Header will be stick to bottom
   ///
   /// By default header positioned until it's offset less than content height
-  final MinOffsetProvider<I> minOffsetProvider;
+  final MinOffsetProvider<I>? minOffsetProvider;
 
   /// If builder should render header
   /// during first run
@@ -80,14 +81,14 @@ class InfiniteListItem<I> {
   final HeaderPositionAxis positionAxis;
 
   /// List item padding, see [EdgeInsets] for more info
-  final EdgeInsets padding;
+  final EdgeInsets? padding;
 
   /// If header should overlay content or not
   final bool overlayContent;
 
   /// Default list item constructor with relative header positioning
   const InfiniteListItem({
-    @required this.contentBuilder,
+    required this.contentBuilder,
     this.headerBuilder,
     this.headerStateBuilder,
     this.minOffsetProvider,
@@ -100,7 +101,7 @@ class InfiniteListItem<I> {
 
   /// List item constructor with overlayed header positioning
   const InfiniteListItem.overlay({
-    @required this.contentBuilder,
+    required this.contentBuilder,
     this.headerBuilder,
     this.headerStateBuilder,
     this.minOffsetProvider,
@@ -126,12 +127,12 @@ class InfiniteListItem<I> {
   /// If [headerBuilder] and [headerStateBuilder] not specified, this method won't be called
   ///
   /// Second param [StickyState] will be passed if [watchStickyState] is `TRUE`
-  Widget buildHeader(BuildContext context, [StickyState<I> state]) {
+  Widget buildHeader(BuildContext context, [StickyState<I>? state]) {
     if (state == null) {
-      return headerBuilder(context);
+      return headerBuilder!(context);
     }
 
-    return headerStateBuilder(context, state);
+    return headerStateBuilder!(context, state);
   }
 
   /// Content item builder
@@ -185,7 +186,7 @@ class InfiniteList extends StatefulWidget {
   final ItemBuilder<int> builder;
 
   /// Scroll controller
-  final ScrollController controller;
+  final ScrollController? controller;
 
   /// List direction
   ///
@@ -196,12 +197,12 @@ class InfiniteList extends StatefulWidget {
   final InfiniteListDirection direction;
 
   /// Max child count for positive direction list
-  final int posChildCount;
+  final int? posChildCount;
 
   /// Max child count for negative list direction
   ///
   /// Ignored when [direction] is [InfiniteListDirection.single]
-  final int negChildCount;
+  final int? negChildCount;
 
   /// Proxy property for [ScrollView.reverse]
   ///
@@ -215,7 +216,7 @@ class InfiniteList extends StatefulWidget {
   final double anchor;
 
   /// Proxy property for [RenderViewportBase.cacheExtent]
-  final double cacheExtent;
+  final double? cacheExtent;
 
   /// Scroll direction
   ///
@@ -226,13 +227,13 @@ class InfiniteList extends StatefulWidget {
   final Axis scrollDirection;
 
   /// Proxy property for [ScrollView.physics]
-  final ScrollPhysics physics;
+  final ScrollPhysics? physics;
 
-  final Key _centerKey;
+  final Key? _centerKey;
 
   InfiniteList({
-    Key key,
-    @required this.builder,
+    Key? key,
+    required this.builder,
     this.controller,
     this.direction = InfiniteListDirection.single,
     this.posChildCount,
@@ -252,7 +253,7 @@ class InfiniteList extends StatefulWidget {
 }
 
 class _InfiniteListState extends State<InfiniteList> {
-  StreamController<StickyState> _streamController =
+  final StreamController<StickyState<int>> _streamController =
       StreamController<StickyState<int>>.broadcast();
 
   SliverList get _reverseList => SliverList(
@@ -324,10 +325,10 @@ class _StickySliverListItem<I> extends StatefulWidget {
       streamController.stream.where((state) => state.index == index);
 
   _StickySliverListItem({
-    Key key,
-    this.index,
-    this.listItem,
-    this.streamController,
+    Key? key,
+    required this.index,
+    required this.listItem,
+    required this.streamController,
   }) : super(key: key);
 
   @override
@@ -350,7 +351,7 @@ class _StickySliverListItemState<I> extends State<_StickySliverListItem<I>> {
     }
 
     return Padding(
-      padding: widget.listItem.padding,
+      padding: widget.listItem.padding!,
       child: _buildItem(context),
     );
   }
@@ -405,7 +406,7 @@ class StickyListItem<I> extends Stack {
   /// Stream sink object
   ///
   /// If provided - render object will emit event on each header offset change
-  final StreamSink<StickyState<I>> streamSink;
+  final StreamSink<StickyState<I>>? streamSink;
 
   /// Value that will be used inside [StickyState] object
   /// during stream event emit
@@ -414,7 +415,7 @@ class StickyListItem<I> extends Stack {
   /// Callback function that tells when header to stick to the bottom.
   ///
   /// If it returns `null` or callback not provided - min offset will be header height
-  final MinOffsetProvider<I> minOffsetProvider;
+  final MinOffsetProvider<I>? minOffsetProvider;
 
   /// Header alignment against main axis direction
   ///
@@ -438,16 +439,16 @@ class StickyListItem<I> extends Stack {
 
   /// Default sticky item constructor with relative header positioning
   StickyListItem({
-    @required Widget header,
-    @required Widget content,
-    @required this.itemIndex,
+    required Widget header,
+    required Widget content,
+    required this.itemIndex,
     this.minOffsetProvider,
     this.streamSink,
     this.mainAxisAlignment = HeaderMainAxisAlignment.start,
     this.crossAxisAlignment = HeaderCrossAxisAlignment.start,
     this.positionAxis = HeaderPositionAxis.mainAxis,
     Clip clipBehavior: Clip.hardEdge,
-    Key key,
+    Key? key,
   })  : overlayContent = false,
         assert(
             positionAxis == HeaderPositionAxis.mainAxis ||
@@ -463,15 +464,15 @@ class StickyListItem<I> extends Stack {
   ///
   /// Header position axis in this case will be against main axis always.
   StickyListItem.overlay({
-    @required Widget header,
-    @required Widget content,
-    @required this.itemIndex,
+    required Widget header,
+    required Widget content,
+    required this.itemIndex,
     this.minOffsetProvider,
     this.streamSink,
     this.mainAxisAlignment = HeaderMainAxisAlignment.start,
     this.crossAxisAlignment = HeaderCrossAxisAlignment.start,
     Clip clipBehavior: Clip.hardEdge,
-    Key key,
+    Key? key,
   })  : overlayContent = true,
         positionAxis = HeaderPositionAxis.mainAxis,
         super(
@@ -480,8 +481,13 @@ class StickyListItem<I> extends Stack {
           clipBehavior: clipBehavior,
         );
 
-  ScrollableState _getScrollableState(BuildContext context) =>
-      Scrollable.of(context);
+  ScrollableState _getScrollableState(BuildContext context) {
+    final ScrollableState? state = Scrollable.of(context);
+
+    assert(state != null, 'StickyListItem requires Scrollable instance');
+
+    return state!;
+  }
 
   @override
   RenderStack createRenderObject(BuildContext context) =>

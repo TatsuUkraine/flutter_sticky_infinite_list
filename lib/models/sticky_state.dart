@@ -44,7 +44,7 @@ class StickyState<I> {
   /// If [InfiniteListItem.initialHeaderBuild] is true with [InfiniteListItem.overlay],
   /// or default [InfiniteListItem] constructor is used,
   /// initial header render will be called without this value
-  final double contentSize;
+  final double? contentSize;
 
   StickyState(this.index,
       {this.position = 0,
@@ -54,10 +54,10 @@ class StickyState<I> {
 
   /// Create state duplicate, with optional state options override
   StickyState<I> copyWith(
-          {double position,
-          double offset,
-          bool sticky,
-          double contentHeight}) =>
+          {double? position,
+          double? offset,
+          bool? sticky,
+          double? contentHeight}) =>
       StickyState<I>(
         index,
         position: position ?? this.position,
