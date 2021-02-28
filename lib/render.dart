@@ -118,7 +118,13 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
   RenderBox get _contentBox => firstChild!;
 
-  RenderAbstractViewport? get _viewport => RenderAbstractViewport.of(this);
+  RenderAbstractViewport get _viewport {
+    final viewport = RenderAbstractViewport.of(this);
+
+    assert(viewport != null, 'Can\'t find viewport');
+
+    return viewport!;
+  }
 
   @override
   void attach(PipelineOwner owner) {
@@ -193,7 +199,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
     final double offset = _calculateStateOffset(stuckOffset, contentSize);
     final double position = offset / contentSize;
 
-    final StickyState state = StickyState<I>(
+    final StickyState<I> state = StickyState<I>(
       itemIndex,
       position: position,
       offset: offset,
@@ -201,7 +207,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
     );
 
     final double headerOffset = _calculateHeaderOffset(contentSize, stuckOffset,
-        headerSize, minOffsetProvider(state as StickyState<I>));
+        headerSize, minOffsetProvider(state));
 
     parentData.offset =
         _headerDirectionalOffset(parentData.offset, headerOffset);
@@ -285,14 +291,14 @@ class StickyListItemRenderObject<I> extends RenderStack {
     double? viewportSize;
 
     if (viewportContainer is RenderBox) {
-      final RenderBox? viewportBox = viewportContainer as RenderBox?;
+      final RenderBox viewportBox = viewportContainer as RenderBox;
 
       viewportSize = _scrollDirectionVertical
-          ? viewportBox!.size.height
-          : viewportBox!.size.width;
+          ? viewportBox.size.height
+          : viewportBox.size.width;
     }
 
-    assert(viewportSize != null, 'Can\'t define view port size');
+    assert(viewportSize != null, 'Can\'t define viewport size');
 
     double anchor = 0;
 
@@ -308,7 +314,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
   }
 
   double get _stuckOffset {
-    return _viewport!.getOffsetToReveal(this, 0).offset -
+    return _viewport.getOffsetToReveal(this, 0).offset -
         _scrollable.position.pixels -
         _scrollableSize;
   }
