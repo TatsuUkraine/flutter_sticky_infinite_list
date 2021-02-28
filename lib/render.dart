@@ -11,25 +11,25 @@ import 'models/types.dart';
 /// Sticky item render object based on [RenderStack]
 class StickyListItemRenderObject<I> extends RenderStack {
   ScrollableState _scrollable;
-  StreamSink<StickyState<I>> _streamSink;
+  StreamSink<StickyState<I>>? _streamSink;
   I _itemIndex;
-  MinOffsetProvider<I> _minOffsetProvider;
+  MinOffsetProvider<I>? _minOffsetProvider;
   bool _overlayContent;
   HeaderPositionAxis _positionAxis;
   HeaderMainAxisAlignment _mainAxisAlignment;
   HeaderCrossAxisAlignment _crossAxisAlignment;
 
-  double _lastOffset;
+  double? _lastOffset;
   bool _headerOverflow = false;
 
   StickyListItemRenderObject({
-    @required ScrollableState scrollable,
-    @required I itemIndex,
-    MinOffsetProvider<I> minOffsetProvider,
-    StreamSink<StickyState<I>> streamSink,
-    TextDirection textDirection,
+    required ScrollableState scrollable,
+    required I itemIndex,
+    MinOffsetProvider<I>? minOffsetProvider,
+    StreamSink<StickyState<I>>? streamSink,
+    TextDirection? textDirection,
     Clip clipBehavior = Clip.hardEdge,
-    bool overlayContent,
+    bool overlayContent = false,
     HeaderPositionAxis positionAxis = HeaderPositionAxis.mainAxis,
     HeaderMainAxisAlignment mainAxisAlignment = HeaderMainAxisAlignment.start,
     HeaderCrossAxisAlignment crossAxisAlignment =
@@ -50,9 +50,9 @@ class StickyListItemRenderObject<I> extends RenderStack {
           clipBehavior: clipBehavior,
         );
 
-  StreamSink<StickyState<I>> get streamSink => _streamSink;
+  StreamSink<StickyState<I>>? get streamSink => _streamSink;
 
-  set streamSink(StreamSink<StickyState<I>> sink) {
+  set streamSink(StreamSink<StickyState<I>>? sink) {
     _streamSink = sink;
     markNeedsPaint();
   }
@@ -67,7 +67,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
   MinOffsetProvider<I> get minOffsetProvider =>
       _minOffsetProvider ?? (state) => null;
 
-  set minOffsetProvider(MinOffsetProvider<I> offsetProvider) {
+  set minOffsetProvider(MinOffsetProvider<I>? offsetProvider) {
     _minOffsetProvider = offsetProvider;
     markNeedsPaint();
   }
@@ -103,8 +103,6 @@ class StickyListItemRenderObject<I> extends RenderStack {
   ScrollableState get scrollable => _scrollable;
 
   set scrollable(ScrollableState newScrollable) {
-    assert(newScrollable != null);
-
     final ScrollableState oldScrollable = _scrollable;
     _scrollable = newScrollable;
 
@@ -116,11 +114,17 @@ class StickyListItemRenderObject<I> extends RenderStack {
     }
   }
 
-  RenderBox get _headerBox => lastChild;
+  RenderBox get _headerBox => lastChild!;
 
-  RenderBox get _contentBox => firstChild;
+  RenderBox get _contentBox => firstChild!;
 
-  RenderAbstractViewport get _viewport => RenderAbstractViewport.of(this);
+  RenderAbstractViewport get _viewport {
+    final viewport = RenderAbstractViewport.of(this);
+
+    assert(viewport != null, 'Can\'t find viewport');
+
+    return viewport!;
+  }
 
   @override
   void attach(PipelineOwner owner) {
@@ -135,7 +139,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
   }
 
   @override
-  Rect describeApproximatePaintClip(RenderObject child) =>
+  Rect? describeApproximatePaintClip(RenderObject child) =>
       _headerOverflow ? Offset.zero & size : null;
 
   @override
@@ -144,7 +148,8 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
     if (clipBehavior != Clip.none && _headerOverflow) {
       context.pushClipRect(
-          needsCompositing, paintOffset, Offset.zero & size, paintStack, clipBehavior: clipBehavior);
+          needsCompositing, paintOffset, Offset.zero & size, paintStack,
+          clipBehavior: clipBehavior);
     } else {
       paintStack(context, paintOffset);
     }
@@ -186,22 +191,23 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
     final double stuckOffset = _stuckOffset;
 
-    final StackParentData parentData = _headerBox.parentData;
+    final StackParentData parentData =
+        _headerBox.parentData as StackParentData;
     final double contentSize = _contentDirectionSize;
     final double headerSize = _headerDirectionSize;
 
     final double offset = _calculateStateOffset(stuckOffset, contentSize);
     final double position = offset / contentSize;
 
-    final StickyState state = StickyState<I>(
+    final StickyState<I> state = StickyState<I>(
       itemIndex,
       position: position,
       offset: offset,
       contentSize: contentSize,
     );
 
-    final double headerOffset = _calculateHeaderOffset(
-        contentSize, stuckOffset, headerSize, minOffsetProvider(state));
+    final double headerOffset = _calculateHeaderOffset(contentSize, stuckOffset,
+        headerSize, minOffsetProvider(state));
 
     parentData.offset =
         _headerDirectionalOffset(parentData.offset, headerOffset);
@@ -282,7 +288,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
   double get _scrollableSize {
     final viewportContainer = _viewport;
 
-    double viewportSize;
+    double? viewportSize;
 
     if (viewportContainer is RenderBox) {
       final RenderBox viewportBox = viewportContainer as RenderBox;
@@ -292,7 +298,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
           : viewportBox.size.width;
     }
 
-    assert(viewportSize != null, 'Can\'t define view port size');
+    assert(viewportSize != null, 'Can\'t define viewport size');
 
     double anchor = 0;
 
@@ -301,10 +307,10 @@ class StickyListItemRenderObject<I> extends RenderStack {
     }
 
     if (_alignmentStart) {
-      return -viewportSize * anchor;
+      return -viewportSize! * anchor;
     }
 
-    return viewportSize - viewportSize * anchor;
+    return viewportSize! - viewportSize * anchor;
   }
 
   double get _stuckOffset {
@@ -316,8 +322,9 @@ class StickyListItemRenderObject<I> extends RenderStack {
   double get _contentDirectionSize =>
       _scrollDirectionVertical ? size.height : size.width;
 
-  double get _headerDirectionSize =>
-      _scrollDirectionVertical ? _headerBox.size.height : _headerBox.size.width;
+  double get _headerDirectionSize => _scrollDirectionVertical
+      ? _headerBox.size.height
+      : _headerBox.size.width;
 
   Offset _headerDirectionalOffset(Offset originalOffset, double offset) {
     if (_scrollDirectionVertical) {
@@ -339,7 +346,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
   double _calculateHeaderOffset(
       double contentSize, double stuckOffset, double headerSize,
-      [double providedMinOffset]) {
+      [double? providedMinOffset]) {
     if (providedMinOffset == null) {
       providedMinOffset = headerSize;
     }
