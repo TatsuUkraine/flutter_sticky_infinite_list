@@ -114,9 +114,9 @@ class StickyListItemRenderObject<I> extends RenderStack {
     }
   }
 
-  RenderBox? get _headerBox => lastChild;
+  RenderBox get _headerBox => lastChild!;
 
-  RenderBox? get _contentBox => firstChild;
+  RenderBox get _contentBox => firstChild!;
 
   RenderAbstractViewport? get _viewport => RenderAbstractViewport.of(this);
 
@@ -152,7 +152,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
   @override
   void performLayout() {
     final BoxConstraints constraints = this.constraints;
-    final RenderBox header = _headerBox!;
+    final RenderBox header = _headerBox;
 
     double constraintWidth = constraints.minWidth;
     double constraintHeight = constraints.minHeight;
@@ -186,7 +186,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
     final double stuckOffset = _stuckOffset;
 
     final StackParentData parentData =
-        _headerBox!.parentData as StackParentData;
+        _headerBox.parentData as StackParentData;
     final double contentSize = _contentDirectionSize;
     final double headerSize = _headerDirectionSize;
 
@@ -224,11 +224,11 @@ class StickyListItemRenderObject<I> extends RenderStack {
             _positionAxis == HeaderPositionAxis.mainAxis ||
         !_scrollDirectionVertical &&
             _positionAxis == HeaderPositionAxis.crossAxis) {
-      return _contentBox!.getMinIntrinsicWidth(height);
+      return _contentBox.getMinIntrinsicWidth(height);
     }
 
-    return _contentBox!.getMinIntrinsicWidth(height) +
-        _headerBox!.getMinIntrinsicWidth(height);
+    return _contentBox.getMinIntrinsicWidth(height) +
+        _headerBox.getMinIntrinsicWidth(height);
   }
 
   @override
@@ -238,11 +238,11 @@ class StickyListItemRenderObject<I> extends RenderStack {
             _positionAxis == HeaderPositionAxis.mainAxis ||
         !_scrollDirectionVertical &&
             _positionAxis == HeaderPositionAxis.crossAxis) {
-      return _contentBox!.getMaxIntrinsicWidth(height);
+      return _contentBox.getMaxIntrinsicWidth(height);
     }
 
-    return _contentBox!.getMaxIntrinsicWidth(height) +
-        _headerBox!.getMaxIntrinsicWidth(height);
+    return _contentBox.getMaxIntrinsicWidth(height) +
+        _headerBox.getMaxIntrinsicWidth(height);
   }
 
   @override
@@ -252,11 +252,11 @@ class StickyListItemRenderObject<I> extends RenderStack {
             _positionAxis == HeaderPositionAxis.crossAxis ||
         !_scrollDirectionVertical &&
             _positionAxis == HeaderPositionAxis.mainAxis) {
-      return _contentBox!.getMinIntrinsicHeight(width);
+      return _contentBox.getMinIntrinsicHeight(width);
     }
 
-    return _contentBox!.getMinIntrinsicHeight(width) +
-        _headerBox!.getMinIntrinsicHeight(width);
+    return _contentBox.getMinIntrinsicHeight(width) +
+        _headerBox.getMinIntrinsicHeight(width);
   }
 
   @override
@@ -266,11 +266,11 @@ class StickyListItemRenderObject<I> extends RenderStack {
             _positionAxis == HeaderPositionAxis.crossAxis ||
         !_scrollDirectionVertical &&
             _positionAxis == HeaderPositionAxis.mainAxis) {
-      return _contentBox!.getMinIntrinsicHeight(width);
+      return _contentBox.getMinIntrinsicHeight(width);
     }
 
-    return _contentBox!.getMinIntrinsicHeight(width) +
-        _headerBox!.getMinIntrinsicHeight(width);
+    return _contentBox.getMinIntrinsicHeight(width) +
+        _headerBox.getMinIntrinsicHeight(width);
   }
 
   bool get _scrollDirectionVertical =>
@@ -317,8 +317,8 @@ class StickyListItemRenderObject<I> extends RenderStack {
       _scrollDirectionVertical ? size.height : size.width;
 
   double get _headerDirectionSize => _scrollDirectionVertical
-      ? _headerBox!.size.height
-      : _headerBox!.size.width;
+      ? _headerBox.size.height
+      : _headerBox.size.width;
 
   Offset _headerDirectionalOffset(Offset originalOffset, double offset) {
     if (_scrollDirectionVertical) {
@@ -381,7 +381,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
   }
 
   Size _layoutContent(BoxConstraints constraints, Size headerSize) {
-    final RenderBox content = _contentBox!;
+    final RenderBox content = _contentBox;
     final StackParentData contentParentData =
         content.parentData as StackParentData;
     contentParentData.offset = Offset.zero;

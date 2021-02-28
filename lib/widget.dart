@@ -481,13 +481,8 @@ class StickyListItem<I> extends Stack {
           clipBehavior: clipBehavior,
         );
 
-  ScrollableState? _getScrollableState(BuildContext context) {
-    final ScrollableState? state = Scrollable.of(context);
-
-    //assert(state == null, 'Can\'t find Scrollable');
-
-    return state!;
-  }
+  ScrollableState? _getScrollableState(BuildContext context) =>
+      Scrollable.of(context)!;
 
   @override
   RenderStack createRenderObject(BuildContext context) =>
