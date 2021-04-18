@@ -226,8 +226,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
     final double stuckOffset = _stuckOffset;
 
-    final StackParentData parentData =
-        _headerBox.parentData as StackParentData;
+    final StackParentData parentData = _headerBox.parentData as StackParentData;
     final double contentSize = _contentDirectionSize;
     final double headerSize = _headerDirectionSize;
 
@@ -241,8 +240,8 @@ class StickyListItemRenderObject<I> extends RenderStack {
       contentSize: contentSize,
     );
 
-    final double headerOffset = _calculateHeaderOffset(contentSize, stuckOffset,
-        headerSize, minOffsetProvider(state));
+    final double headerOffset = _calculateHeaderOffset(
+        contentSize, stuckOffset, headerSize, minOffsetProvider(state));
 
     parentData.offset =
         _headerDirectionalOffset(parentData.offset, headerOffset);
@@ -357,9 +356,8 @@ class StickyListItemRenderObject<I> extends RenderStack {
   double get _contentDirectionSize =>
       _scrollDirectionVertical ? size.height : size.width;
 
-  double get _headerDirectionSize => _scrollDirectionVertical
-      ? _headerBox.size.height
-      : _headerBox.size.width;
+  double get _headerDirectionSize =>
+      _scrollDirectionVertical ? _headerBox.size.height : _headerBox.size.width;
 
   Offset _headerDirectionalOffset(Offset originalOffset, double offset) {
     if (_scrollDirectionVertical) {
@@ -478,53 +476,25 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
   Offset _offsetContent(Size headerSize) {
     if (!_overlayContent) {
-      if (
-        (
-          (
-            _positionAxis == HeaderPositionAxis.crossAxis &&
-            _scrollDirectionVertical
-          ) ||
-          (
-            _positionAxis == HeaderPositionAxis.mainAxis &&
-            !_scrollDirectionVertical
-          )
-        ) &&
-        (
-          (
-            _crossAxisAlignment == HeaderCrossAxisAlignment.start &&
-            _scrollDirectionVertical
-          ) ||
-          (
-            _mainAxisAlignment == HeaderMainAxisAlignment.start &&
-            !_scrollDirectionVertical
-          )
-        )
-      ) {
+      if (((_positionAxis == HeaderPositionAxis.crossAxis &&
+                  _scrollDirectionVertical) ||
+              (_positionAxis == HeaderPositionAxis.mainAxis &&
+                  !_scrollDirectionVertical)) &&
+          ((_crossAxisAlignment == HeaderCrossAxisAlignment.start &&
+                  _scrollDirectionVertical) ||
+              (_mainAxisAlignment == HeaderMainAxisAlignment.start &&
+                  !_scrollDirectionVertical))) {
         return Offset(headerSize.width, 0);
       }
 
-      if (
-        (
-          (
-            _positionAxis == HeaderPositionAxis.mainAxis &&
-            _scrollDirectionVertical
-          ) ||
-          (
-            _positionAxis == HeaderPositionAxis.crossAxis &&
-            !_scrollDirectionVertical
-          )
-        ) &&
-        (
-          (
-            _mainAxisAlignment == HeaderMainAxisAlignment.start &&
-            _scrollDirectionVertical
-          ) ||
-          (
-            _crossAxisAlignment == HeaderCrossAxisAlignment.start &&
-            !_scrollDirectionVertical
-          )
-        )
-      ) {
+      if (((_positionAxis == HeaderPositionAxis.mainAxis &&
+                  _scrollDirectionVertical) ||
+              (_positionAxis == HeaderPositionAxis.crossAxis &&
+                  !_scrollDirectionVertical)) &&
+          ((_mainAxisAlignment == HeaderMainAxisAlignment.start &&
+                  _scrollDirectionVertical) ||
+              (_crossAxisAlignment == HeaderCrossAxisAlignment.start &&
+                  !_scrollDirectionVertical))) {
         return Offset(0, headerSize.height);
       }
     }
