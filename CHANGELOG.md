@@ -1,3 +1,7 @@
+## [4.0.1] - 2021-04-19
+
+- implement missing dry layout calculation
+
 ## [4.0.0] - 2021-03-01
 
 - stable null-safety release
