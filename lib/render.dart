@@ -245,7 +245,11 @@ class StickyListItemRenderObject<I> extends RenderStack {
     );
 
     final double headerOffset = _calculateHeaderOffset(
-        contentSize, stuckOffset, headerSize, minOffsetProvider(state));
+      contentSize: contentSize,
+      stuckOffset: stuckOffset,
+      headerSize: headerSize,
+      providedMinOffset: minOffsetProvider(state),
+    );
 
     parentData.offset = _headerDirectionalOffset(
       parentData.offset,
@@ -262,7 +266,11 @@ class StickyListItemRenderObject<I> extends RenderStack {
           sticky: _isSticky(
             state: state,
             actualHeaderOffset: headerOffset,
-            headerOffset: _calculateHeaderOffset(contentSize, stuckOffset, headerSize),
+            headerOffset: _calculateHeaderOffset(
+              contentSize: contentSize,
+              stuckOffset: stuckOffset,
+              headerSize: headerSize,
+            ),
           ),
         ),
       );
@@ -389,9 +397,12 @@ class StickyListItemRenderObject<I> extends RenderStack {
     return contentSize - offset;
   }
 
-  double _calculateHeaderOffset(
-      double contentSize, double stuckOffset, double headerSize,
-      [double? providedMinOffset]) {
+  double _calculateHeaderOffset({
+    required double contentSize,
+    required double stuckOffset,
+    required double headerSize,
+    double? providedMinOffset,
+  }) {
     if (providedMinOffset == null) {
       providedMinOffset = headerSize;
     }
