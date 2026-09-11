@@ -256,7 +256,11 @@ class StickyListItemRenderObject<I> extends RenderStack {
       headerOffset,
     );
 
-    _headerOverflow = _isHeaderOverflow(headerOffset, headerSize, contentSize);
+    _headerOverflow = _isHeaderOverflow(
+      headerOffset: headerOffset,
+      headerSize: headerSize,
+      contentSize: contentSize,
+    );
 
     if (_lastOffset != offset) {
       _lastOffset = offset;
@@ -430,8 +434,11 @@ class StickyListItemRenderObject<I> extends RenderStack {
     return minOffset;
   }
 
-  bool _isHeaderOverflow(
-      double headerOffset, double headerSize, double contentSize) {
+  bool _isHeaderOverflow({
+    required double headerOffset,
+    required double headerSize,
+    required double contentSize,
+  }) {
     return headerOffset < 0 || headerOffset + headerSize > contentSize;
   }
 
