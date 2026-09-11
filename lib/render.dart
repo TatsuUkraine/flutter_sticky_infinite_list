@@ -260,9 +260,9 @@ class StickyListItemRenderObject<I> extends RenderStack {
       streamSink?.add(
         state.copyWith(
           sticky: _isSticky(
-            state,
-            headerOffset,
-            _calculateHeaderOffset(contentSize, stuckOffset, headerSize),
+            state: state,
+            actualHeaderOffset: headerOffset,
+            headerOffset: _calculateHeaderOffset(contentSize, stuckOffset, headerSize),
           ),
         ),
       );
@@ -424,8 +424,11 @@ class StickyListItemRenderObject<I> extends RenderStack {
     return headerOffset < 0 || headerOffset + headerSize > contentSize;
   }
 
-  bool _isSticky(
-      StickyState<I> state, double actualHeaderOffset, double headerOffset) {
+  bool _isSticky({
+    required StickyState<I> state,
+    required double actualHeaderOffset,
+    required double headerOffset,
+  }) {
     return (actualHeaderOffset == headerOffset &&
         state.position > 0 &&
         state.position < 1);
