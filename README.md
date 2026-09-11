@@ -597,10 +597,3 @@ different way in reverse mode, comparing to regular scroll direction.
 
 But there is an workaround can be used, described
 in [Reverse infinite scroll](#reverse-infinite-scroll)
-
-## Flutter version related errors
-
-### Named parameter clipBehavior isn't defined error
-
-If you get this kind of error, most likely you are using Flutter 1.17.
-If so, please ensure that you're using 2.x.x version.
