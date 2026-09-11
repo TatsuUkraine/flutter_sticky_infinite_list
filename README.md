@@ -32,13 +32,15 @@ benefits for performance that Flutter provides.
 - dynamic header build on content scroll
 - dynamic min offset calculation on content scroll
 
-## Flutter before 1.20
+## Flutter versions support
 
 If you're using Flutter version lower than 1.20 consider using v2.x.x.
 
+For Flutter version lower than 3.41 consider using v3-v4.
+
 ## Migration guide
 
-If you using older MAJOR versions, please
+If you are using older MAJOR versions, please
 [visit this migration guide](https://github.com/TatsuUkraine/flutter_sticky_infinite_list/blob/master/MIGRATION.md)
 
 ### Property not defined
