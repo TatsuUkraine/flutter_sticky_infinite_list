@@ -22,7 +22,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
   double? _lastOffset;
   bool _headerOverflow = false;
 
-  ClipRectLayer? _clipRectLayer;
+  final LayerHandle<ClipRectLayer> _clipRectLayer = LayerHandle<ClipRectLayer>();
 
   StickyListItemRenderObject({
     required ScrollableState scrollable,
@@ -142,11 +142,16 @@ class StickyListItemRenderObject<I> extends RenderStack {
     _updateHeaderOffset();
 
     if (clipBehavior != Clip.none && _headerOverflow) {
-      _clipRectLayer = context.pushClipRect(
-          needsCompositing, paintOffset, Offset.zero & size, paintStack,
-          clipBehavior: clipBehavior, oldLayer: _clipRectLayer);
+      _clipRectLayer.layer = context.pushClipRect(
+        needsCompositing,
+        paintOffset,
+        Offset.zero & size,
+        paintStack,
+        clipBehavior: clipBehavior,
+        oldLayer: _clipRectLayer.layer,
+      );
     } else {
-      _clipRectLayer = null;
+      _clipRectLayer.layer = null;
       paintStack(context, paintOffset);
     }
   }
@@ -184,6 +189,12 @@ class StickyListItemRenderObject<I> extends RenderStack {
         .alongOffset(size - header.size as Offset);
 
     contentParentData.offset = _offsetContent(header.size);
+  }
+
+  @override
+  void dispose() {
+    _clipRectLayer.layer = null;
+    super.dispose();
   }
 
   Size _computeSize({
