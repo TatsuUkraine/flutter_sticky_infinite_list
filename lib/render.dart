@@ -34,8 +34,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
     bool overlayContent = false,
     HeaderPositionAxis positionAxis = HeaderPositionAxis.mainAxis,
     HeaderMainAxisAlignment mainAxisAlignment = HeaderMainAxisAlignment.start,
-    HeaderCrossAxisAlignment crossAxisAlignment =
-        HeaderCrossAxisAlignment.start,
+    HeaderCrossAxisAlignment crossAxisAlignment = HeaderCrossAxisAlignment.start,
   })  : _scrollable = scrollable,
         _streamSink = streamSink,
         _itemIndex = itemIndex,
@@ -120,13 +119,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
   RenderBox get _contentBox => firstChild!;
 
-  RenderAbstractViewport get _viewport {
-    final viewport = RenderAbstractViewport.of(this);
-
-    assert(viewport != null, 'Can\'t find viewport');
-
-    return viewport!;
-  }
+  RenderAbstractViewport get _viewport => RenderAbstractViewport.of(this);
 
   @override
   void attach(PipelineOwner owner) {
@@ -243,17 +236,25 @@ class StickyListItemRenderObject<I> extends RenderStack {
     final double headerOffset = _calculateHeaderOffset(
         contentSize, stuckOffset, headerSize, minOffsetProvider(state));
 
-    parentData.offset =
-        _headerDirectionalOffset(parentData.offset, headerOffset);
+    parentData.offset = _headerDirectionalOffset(
+      parentData.offset,
+      headerOffset,
+    );
 
     _headerOverflow = _isHeaderOverflow(headerOffset, headerSize, contentSize);
 
     if (_lastOffset != offset) {
       _lastOffset = offset;
 
-      streamSink?.add(state.copyWith(
-          sticky: _isSticky(state, headerOffset,
-              _calculateHeaderOffset(contentSize, stuckOffset, headerSize))));
+      streamSink?.add(
+        state.copyWith(
+          sticky: _isSticky(
+            state,
+            headerOffset,
+            _calculateHeaderOffset(contentSize, stuckOffset, headerSize),
+          ),
+        ),
+      );
     }
   }
 
@@ -524,7 +525,6 @@ class StickyListItemRenderObject<I> extends RenderStack {
         return vertical ? Alignment.bottomCenter : Alignment.centerRight;
 
       case HeaderCrossAxisAlignment.start:
-      default:
         if (mainAxisAlignment == HeaderMainAxisAlignment.start) {
           return Alignment.topLeft;
         }
