@@ -12,7 +12,7 @@ issue_tracker: https://github.com/TatsuUkraine/flutter_sticky_infinite_list/issu
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
-  flutter: '>=3.41.0 <4.0.0'
+  flutter: '>=3.41.0'
 
 dependencies:
   flutter:
