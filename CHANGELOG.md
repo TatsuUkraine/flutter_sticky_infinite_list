@@ -1,3 +1,8 @@
+## [5.0.0] - 2026-09-15
+
+- replace deprecated param usage for `CustomerScrollView`
+- increase min supported Flutter version to 3.41
+
 ## [4.0.1] - 2021-04-19
 
 - implement missing dry layout calculation

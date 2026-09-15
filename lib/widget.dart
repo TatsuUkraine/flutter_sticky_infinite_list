@@ -215,8 +215,8 @@ class InfiniteList extends StatefulWidget {
   /// Proxy property for [ScrollView.anchor]
   final double anchor;
 
-  /// Proxy property for [RenderViewportBase.cacheExtent]
-  final double? cacheExtent;
+  /// Proxy property for [RenderViewportBase.scrollCacheExtent]
+  final ScrollCacheExtent? scrollCacheExtent;
 
   /// Scroll direction
   ///
@@ -240,7 +240,7 @@ class InfiniteList extends StatefulWidget {
     this.negChildCount,
     //this.reverse = false,
     this.anchor = 0.0,
-    this.cacheExtent,
+    this.scrollCacheExtent,
     this.scrollDirection = Axis.vertical,
     this.physics,
   })  : _centerKey = (direction == InfiniteListDirection.multi)
@@ -288,7 +288,6 @@ class _InfiniteListState extends State<InfiniteList> {
         ];
 
       case InfiniteListDirection.single:
-      default:
         return [
           _forwardList,
         ];
@@ -302,7 +301,7 @@ class _InfiniteListState extends State<InfiniteList> {
         slivers: _slivers,
         reverse: widget.reverse,
         anchor: widget.anchor,
-        cacheExtent: widget.cacheExtent,
+        scrollCacheExtent: widget.scrollCacheExtent,
         scrollDirection: widget.scrollDirection,
         physics: widget.physics,
       );
@@ -447,7 +446,7 @@ class StickyListItem<I> extends Stack {
     this.mainAxisAlignment = HeaderMainAxisAlignment.start,
     this.crossAxisAlignment = HeaderCrossAxisAlignment.start,
     this.positionAxis = HeaderPositionAxis.mainAxis,
-    Clip clipBehavior: Clip.hardEdge,
+    Clip clipBehavior = Clip.hardEdge,
     Key? key,
   })  : overlayContent = false,
         assert(
@@ -471,7 +470,7 @@ class StickyListItem<I> extends Stack {
     this.streamSink,
     this.mainAxisAlignment = HeaderMainAxisAlignment.start,
     this.crossAxisAlignment = HeaderCrossAxisAlignment.start,
-    Clip clipBehavior: Clip.hardEdge,
+    Clip clipBehavior = Clip.hardEdge,
     Key? key,
   })  : overlayContent = true,
         positionAxis = HeaderPositionAxis.mainAxis,

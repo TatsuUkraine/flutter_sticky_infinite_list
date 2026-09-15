@@ -22,7 +22,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
   double? _lastOffset;
   bool _headerOverflow = false;
 
-  ClipRectLayer? _clipRectLayer;
+  final LayerHandle<ClipRectLayer> _clipRectLayer = LayerHandle<ClipRectLayer>();
 
   StickyListItemRenderObject({
     required ScrollableState scrollable,
@@ -34,8 +34,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
     bool overlayContent = false,
     HeaderPositionAxis positionAxis = HeaderPositionAxis.mainAxis,
     HeaderMainAxisAlignment mainAxisAlignment = HeaderMainAxisAlignment.start,
-    HeaderCrossAxisAlignment crossAxisAlignment =
-        HeaderCrossAxisAlignment.start,
+    HeaderCrossAxisAlignment crossAxisAlignment = HeaderCrossAxisAlignment.start,
   })  : _scrollable = scrollable,
         _streamSink = streamSink,
         _itemIndex = itemIndex,
@@ -120,13 +119,7 @@ class StickyListItemRenderObject<I> extends RenderStack {
 
   RenderBox get _contentBox => firstChild!;
 
-  RenderAbstractViewport get _viewport {
-    final viewport = RenderAbstractViewport.of(this);
-
-    assert(viewport != null, 'Can\'t find viewport');
-
-    return viewport!;
-  }
+  RenderAbstractViewport get _viewport => RenderAbstractViewport.of(this);
 
   @override
   void attach(PipelineOwner owner) {
@@ -149,11 +142,16 @@ class StickyListItemRenderObject<I> extends RenderStack {
     _updateHeaderOffset();
 
     if (clipBehavior != Clip.none && _headerOverflow) {
-      _clipRectLayer = context.pushClipRect(
-          needsCompositing, paintOffset, Offset.zero & size, paintStack,
-          clipBehavior: clipBehavior, oldLayer: _clipRectLayer);
+      _clipRectLayer.layer = context.pushClipRect(
+        needsCompositing,
+        paintOffset,
+        Offset.zero & size,
+        paintStack,
+        clipBehavior: clipBehavior,
+        oldLayer: _clipRectLayer.layer,
+      );
     } else {
-      _clipRectLayer = null;
+      _clipRectLayer.layer = null;
       paintStack(context, paintOffset);
     }
   }
@@ -191,6 +189,12 @@ class StickyListItemRenderObject<I> extends RenderStack {
         .alongOffset(size - header.size as Offset);
 
     contentParentData.offset = _offsetContent(header.size);
+  }
+
+  @override
+  void dispose() {
+    _clipRectLayer.layer = null;
+    super.dispose();
   }
 
   Size _computeSize({
@@ -241,19 +245,39 @@ class StickyListItemRenderObject<I> extends RenderStack {
     );
 
     final double headerOffset = _calculateHeaderOffset(
-        contentSize, stuckOffset, headerSize, minOffsetProvider(state));
+      contentSize: contentSize,
+      stuckOffset: stuckOffset,
+      headerSize: headerSize,
+      providedMinOffset: minOffsetProvider(state),
+    );
 
-    parentData.offset =
-        _headerDirectionalOffset(parentData.offset, headerOffset);
+    parentData.offset = _headerDirectionalOffset(
+      parentData.offset,
+      headerOffset,
+    );
 
-    _headerOverflow = _isHeaderOverflow(headerOffset, headerSize, contentSize);
+    _headerOverflow = _isHeaderOverflow(
+      headerOffset: headerOffset,
+      headerSize: headerSize,
+      contentSize: contentSize,
+    );
 
     if (_lastOffset != offset) {
       _lastOffset = offset;
 
-      streamSink?.add(state.copyWith(
-          sticky: _isSticky(state, headerOffset,
-              _calculateHeaderOffset(contentSize, stuckOffset, headerSize))));
+      streamSink?.add(
+        state.copyWith(
+          sticky: _isSticky(
+            state: state,
+            actualHeaderOffset: headerOffset,
+            headerOffset: _calculateHeaderOffset(
+              contentSize: contentSize,
+              stuckOffset: stuckOffset,
+              headerSize: headerSize,
+            ),
+          ),
+        ),
+      );
     }
   }
 
@@ -377,9 +401,12 @@ class StickyListItemRenderObject<I> extends RenderStack {
     return contentSize - offset;
   }
 
-  double _calculateHeaderOffset(
-      double contentSize, double stuckOffset, double headerSize,
-      [double? providedMinOffset]) {
+  double _calculateHeaderOffset({
+    required double contentSize,
+    required double stuckOffset,
+    required double headerSize,
+    double? providedMinOffset,
+  }) {
     if (providedMinOffset == null) {
       providedMinOffset = headerSize;
     }
@@ -407,13 +434,19 @@ class StickyListItemRenderObject<I> extends RenderStack {
     return minOffset;
   }
 
-  bool _isHeaderOverflow(
-      double headerOffset, double headerSize, double contentSize) {
+  bool _isHeaderOverflow({
+    required double headerOffset,
+    required double headerSize,
+    required double contentSize,
+  }) {
     return headerOffset < 0 || headerOffset + headerSize > contentSize;
   }
 
-  bool _isSticky(
-      StickyState<I> state, double actualHeaderOffset, double headerOffset) {
+  bool _isSticky({
+    required StickyState<I> state,
+    required double actualHeaderOffset,
+    required double headerOffset,
+  }) {
     return (actualHeaderOffset == headerOffset &&
         state.position > 0 &&
         state.position < 1);
@@ -524,7 +557,6 @@ class StickyListItemRenderObject<I> extends RenderStack {
         return vertical ? Alignment.bottomCenter : Alignment.centerRight;
 
       case HeaderCrossAxisAlignment.start:
-      default:
         if (mainAxisAlignment == HeaderMainAxisAlignment.start) {
           return Alignment.topLeft;
         }

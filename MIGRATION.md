@@ -59,3 +59,9 @@ render object also was updated due to changes in Flutters render object.
 So if you use `StickyListItemRenderObject` ensure to replace `overflow`
 param with `clipBehavior`. By default it's `Clip.hardEdge`, according to
 default `overflow` key, which was `Overflow.clip` by default
+
+## Migration from v4 to v5
+
+In newer Flutter version `double? cacheExtent` for `CustomScrollView` become deprecated. To keep 
+package in line with `CustomScrollView` changes, `InfiniteList` now use
+`ScrollCacheExtent? scrollCacheExtent` instead of `double? cacheExtent`.
